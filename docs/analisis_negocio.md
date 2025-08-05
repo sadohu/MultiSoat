@@ -61,3 +61,13 @@
 - **Cuota_deuda:** Se utiliza cuando el saldo de una deuda se acuerda pagar en partes. Cada cuota tiene su propio monto, vencimiento y estado.
 - **Pagos:** Pueden aplicarse a deudas completas o a cuotas específicas. El sistema permite pagos parciales, totales y la conversión de saldos pendientes en cuotas.
 - El sistema está preparado para gestionar pagos parciales, amortizaciones, fraccionamiento de deudas en cuotas y la trazabilidad de todos los movimientos asociados a cada deuda y cuota.
+
+## 12. Relación de usuarios (credenciales) con entidades
+- Los usuarios (credenciales) no están relacionados directamente con proveedor, distribuidor o punto de venta mediante un campo FK en esas tablas.
+- La relación se gestiona a través de la tabla `usuario_rol`, que vincula cada usuario con uno o varios roles y entidades (proveedor, distribuidor, punto de venta, etc.).
+- Esto permite que un usuario tenga múltiples roles y pertenezca a varias entidades, y que una entidad tenga varios usuarios asociados.
+- Ejemplo: Un usuario puede ser operador de un punto de venta y, a la vez, administrador de un proveedor, todo gestionado desde `usuario_rol`.
+- Para saber los usuarios de una entidad, se consulta `usuario_rol` filtrando por el rol y el id_entidad correspondiente.
+- Para saber a qué entidades tiene acceso un usuario, se consulta `usuario_rol` filtrando por el id_usuario.
+
+> Este modelo permite máxima flexibilidad y escalabilidad en la gestión de credenciales y permisos.

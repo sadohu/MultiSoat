@@ -22,18 +22,23 @@
 - El resto es ganancia del punto de venta.
 - Los puntos de venta pueden visualizar sus ganancias por las ventas generadas.
 
-## 5. Créditos y Cuotas
-- Cuando una venta es excepcionalmente grande y el punto de venta no puede pagar al contado, se genera un crédito para esa venta.
-- Se crea una deuda asociada a la venta y se pueden definir cuotas para el pago de esa deuda (tabla `cuota_deuda`).
-- El punto de venta debe pagar al proveedor según las ventas realizadas y las condiciones de crédito/cuotas.
 
-## 6. Deudas, Cuotas, Pagos y Moras
-- Cada venta puede generar una deuda del punto de venta hacia el proveedor.
-- Las deudas pueden dividirse en cuotas (tabla `cuota_deuda`), cada una con su propio vencimiento y estado.
-- Los pagos pueden aplicarse a una o varias deudas/cuotas, según lo decida el usuario.
-- Si el pago no cubre una deuda/cuota completa, se registra como amortización parcial.
+## 5. Límite de Stock (Crédito de Stock)
+
+- Cada punto de venta tiene un **crédito de stock**: es el máximo número de certificados que puede tener asignados simultáneamente, definido por el proveedor.
+- Cuando un distribuidor asigna certificados a un punto de venta, debe respetar este límite. Ejemplo: si el crédito de stock es 10 y el PV tiene 5 certificados en stock, solo puede recibir hasta 5 adicionales.
+- El stock disponible se actualiza cada vez que el punto de venta vende un certificado (reduce stock) o recibe una nueva asignación (aumenta stock, sin exceder el límite).
+- El proveedor puede modificar el crédito de stock de cada punto de venta según su política interna.
+- No existe financiamiento ni cuotas: el control es únicamente sobre la cantidad máxima de certificados en poder del punto de venta.
+
+> Nota: Eliminar toda referencia a financiamiento, deudas en cuotas o pagos parciales en este contexto. El sistema solo gestiona el stock asignado y vendido.
+
+## 6. Deudas, Pagos y Moras
+- Cada venta genera una deuda del punto de venta hacia el proveedor, con un plazo de pago determinado.
+- Los pagos pueden aplicarse a una o varias deudas, según lo decida el usuario.
+- Si el pago no cubre una deuda completa, se registra como amortización parcial.
 - Cada proveedor define su política de mora (monto fijo o porcentaje, días de gracia).
-- El sistema calcula y registra moras por atraso en los pagos de deudas o cuotas.
+- El sistema calcula y registra moras por atraso en los pagos de deudas.
 
 ## 7. Visitas
 - Los proveedores o jefes de distribución pueden programar visitas de distribuidores a puntos de venta (por restock, cobros, soporte, etc.).
@@ -48,19 +53,15 @@
 ## 9. Integración Externa
 - Los datos de clientes y vehículos se almacenan en otra base de datos; solo se requiere referencia (ID externo) en las ventas o certificados.
 
-## 10. Conversión de deuda amortizada a cuotas
-- Si un punto de venta (PV) tiene una deuda parcialmente amortizada (ha realizado un pago parcial sobre una deuda de venta) y luego solicita fraccionar el saldo pendiente en cuotas, el sistema permite:
-  1. Verificar el monto pendiente de la deuda original.
-  2. Crear registros en `cuota_deuda` solo por el saldo pendiente.
-  3. Asociar los pagos futuros a estas cuotas.
-  4. Marcar la deuda principal como pagada cuando todas las cuotas estén pagadas.
-- Esto otorga flexibilidad y trazabilidad, manteniendo el historial de pagos y la relación entre la deuda original y las cuotas generadas posteriormente.
 
-## 11. Resumen de gestión de deudas, cuotas y pagos
-- **Deuda:** Se genera por cada venta que el PV debe rendir al proveedor. Puede ser pagada al contado o fraccionada en cuotas.
-- **Cuota_deuda:** Se utiliza cuando el saldo de una deuda se acuerda pagar en partes. Cada cuota tiene su propio monto, vencimiento y estado.
-- **Pagos:** Pueden aplicarse a deudas completas o a cuotas específicas. El sistema permite pagos parciales, totales y la conversión de saldos pendientes en cuotas.
-- El sistema está preparado para gestionar pagos parciales, amortizaciones, fraccionamiento de deudas en cuotas y la trazabilidad de todos los movimientos asociados a cada deuda y cuota.
+## 10. Eliminación de cuotas y financiamiento
+- El sistema no contempla cuotas ni financiamiento. Todas las deudas generadas por ventas deben ser pagadas según el plazo definido por el proveedor.
+- Se mantiene la trazabilidad de pagos y amortizaciones parciales sobre cada deuda.
+
+## 11. Resumen de gestión de deudas y pagos
+- **Deuda:** Se genera por cada venta que el PV debe rendir al proveedor. Puede ser pagada al contado o mediante amortizaciones parciales, pero no se fracciona en cuotas.
+- **Pagos:** Pueden aplicarse a deudas completas o parciales. El sistema permite pagos parciales y totales, manteniendo la trazabilidad de todos los movimientos asociados a cada deuda.
+- El sistema está preparado para gestionar pagos parciales, amortizaciones y la trazabilidad de todos los movimientos asociados a cada deuda.
 
 ## 12. Relación de usuarios (credenciales) con entidades
 - Los usuarios (credenciales) no están relacionados directamente con proveedor, distribuidor o punto de venta mediante un campo FK en esas tablas.

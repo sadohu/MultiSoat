@@ -23,15 +23,15 @@
 - Los puntos de venta pueden visualizar sus ganancias por las ventas generadas.
 
 
-## 5. Límite de Stock (Crédito de Stock)
+## 5. Crédito (Límite de Certificados)
 
-- Cada punto de venta tiene un **crédito de stock**: es el máximo número de certificados que puede tener asignados simultáneamente, definido por el proveedor.
-- Cuando un distribuidor asigna certificados a un punto de venta, debe respetar este límite. Ejemplo: si el crédito de stock es 10 y el PV tiene 5 certificados en stock, solo puede recibir hasta 5 adicionales.
+- Cada punto de venta tiene un **crédito**: es el máximo número de certificados que puede tener asignados simultáneamente, definido por el proveedor.
+- Cuando un distribuidor asigna certificados a un punto de venta, debe respetar este límite. Ejemplo: si el crédito es 10 y el PV tiene 5 certificados en stock, solo puede recibir hasta 5 adicionales.
 - El stock disponible se actualiza cada vez que el punto de venta vende un certificado (reduce stock) o recibe una nueva asignación (aumenta stock, sin exceder el límite).
-- El proveedor puede modificar el crédito de stock de cada punto de venta según su política interna.
+- El proveedor puede modificar el crédito de cada punto de venta según su política interna.
 - No existe financiamiento ni cuotas: el control es únicamente sobre la cantidad máxima de certificados en poder del punto de venta.
 
-> Nota: Eliminar toda referencia a financiamiento, deudas en cuotas o pagos parciales en este contexto. El sistema solo gestiona el stock asignado y vendido.
+> Nota: El sistema solo gestiona el crédito asignado y vendido. El término "crédito" se refiere exclusivamente al límite de certificados asignables, no a financiamiento monetario.
 
 ## 6. Deudas, Pagos y Moras
 - Cada venta genera una deuda del punto de venta hacia el proveedor, con un plazo de pago determinado.

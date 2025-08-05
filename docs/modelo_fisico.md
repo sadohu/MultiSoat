@@ -139,15 +139,18 @@
 - usuario_creacion (FK a usuario)
 - usuario_actualizacion (FK a usuario)
 
-## 12. cuota_deuda
-- id_cuota (PK, serial)
-- id_deuda (FK)
-- monto_cuota (decimal)
-- fecha_vencimiento (date)
-- estado (pendiente/pagada/vencida)
-- fecha_pago (timestamp)
+
+## 12. credito
+- id_credito (PK, serial)
+- id_punto_venta (FK)
+- id_proveedor (FK)
+- limite_credito (int)
+- stock_actual (int)
 - fecha_creacion (timestamp)
+- fecha_actualizacion (timestamp)
 - usuario_creacion (FK a usuario)
+- usuario_actualizacion (FK a usuario)
+- estado (activo/inactivo)
 
 ## 13. pago
 - id_pago (PK, serial)
@@ -164,7 +167,6 @@
 - id_pago_deuda (PK, serial)
 - id_pago (FK)
 - id_deuda (FK)
-- id_cuota (FK, nullable)
 - monto_aplicado (decimal)
 
 ## 15. politica_mora

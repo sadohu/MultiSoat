@@ -90,13 +90,14 @@
 - estado (pendiente/amortizado/pagado/vencido)
 - mora_acumulada
 
-### 12. cuota_deuda
-- id_cuota (PK)
-- id_deuda (FK)
-- monto_cuota
-- fecha_vencimiento
-- estado (pendiente/pagada/vencida)
-- fecha_pago
+
+
+### 12. credito
+- id_credito (PK)
+- id_punto_venta (FK)
+- id_proveedor (FK)
+- limite_credito
+- stock_actual
 
 ### 13. pago
 - id_pago (PK)
@@ -111,7 +112,6 @@
 - id_pago_deuda (PK)
 - id_pago (FK)
 - id_deuda (FK)
-- id_cuota (FK, nullable)
 - monto_aplicado
 
 ### 15. politica_mora
@@ -160,11 +160,18 @@
 ## Ventas y Ganancias
 - venta, venta_certificado, punto_venta, proveedor, descuento_pv
 
-## Créditos y Deudas
-- deuda, cuota_deuda, proveedor, punto_venta
+## Deudas
+- deuda, proveedor, punto_venta
 
 ## Pagos y Moras
-- pago, pago_deuda, deuda, cuota_deuda, politica_mora, proveedor, punto_venta
+- pago, pago_deuda, deuda, politica_mora, proveedor, punto_venta
+# Ejemplos de Flujos para Procesos Esenciales
+
+## 0. Crédito (Límite de Certificados)
+1. El proveedor define el crédito máximo para cada punto de venta (`credito`).
+2. El distribuidor asigna certificados a un punto de venta, respetando el límite de crédito disponible (stock_actual < limite_credito).
+3. Cuando el PV vende certificados, el stock_actual disminuye; cuando recibe nuevas asignaciones, aumenta (sin exceder el límite).
+4. El proveedor puede modificar el crédito según su política.
 
 ## Visitas
 - visita, proveedor, distribuidor, punto_venta
@@ -192,37 +199,16 @@
 4. Se calcula el monto fijo para el proveedor, descuento aplicado y ganancia del PV.
 5. Los certificados cambian su estado a 'vendido'.
 
-## 3. Pagos de Recaudaciones (Venta al Contado)
+## 3. Pagos de Recaudaciones
 1. Por cada venta, se genera una deuda en `deuda` (monto igual a la suma de los montos fijos de los certificados vendidos).
 2. El PV realiza un pago (`pago`).
 3. El pago se asocia a la deuda correspondiente (`pago_deuda`).
 4. Si el pago cubre la deuda, la deuda se marca como 'pagada'.
-5. Si hay atraso, se calcula y registra la mora (`politica_mora`).
+5. Si el pago es parcial, la deuda se mantiene como 'amortizado' y se descuenta el monto pagado.
+6. Si hay atraso, se calcula y registra la mora (`politica_mora`).
 
-## 4. Venta a Crédito (Cuotas)
-1. El PV realiza una venta grande y solicita crédito.
-2. Se genera una deuda en `deuda` (por el monto total a pagar al proveedor).
-3. Se definen cuotas para esa deuda en `cuota_deuda` (por ejemplo, 3 cuotas de S/ 100 cada una, con fechas de vencimiento).
-4. Cada cuota tiene su propio estado (pendiente/pagada/vencida).
 
-## 5. Pagos de Deuda y Pagos de Cuotas
-### Pago de Deuda Completa
-1. El PV realiza un pago por el total de la deuda (`pago`).
-2. El pago se asocia a la deuda en `pago_deuda` y la deuda se marca como 'pagada'.
-
-### Pago de Cuotas
-1. El PV realiza un pago parcial, cubriendo una o varias cuotas (`pago`).
-2. El pago se asocia a las cuotas correspondientes en `pago_deuda` (puede cubrir una o varias cuotas, usando el campo `id_cuota`).
-3. Las cuotas pagadas se marcan como 'pagadas'.
-4. Si alguna cuota queda pendiente y vence, se calcula y registra la mora.
-
-## 6. Conversión de deuda amortizada a cuotas
-1. El PV tiene una deuda de venta parcialmente amortizada (por ejemplo, pagó una parte).
-2. Solicita fraccionar el saldo pendiente en cuotas.
-3. El sistema crea registros en `cuota_deuda` solo por el saldo pendiente.
-4. Los pagos futuros se asocian a estas cuotas.
-5. Cuando todas las cuotas estén pagadas, la deuda principal se marca como pagada.
 
 ---
 
-> Este bosquejo y los ejemplos reflejan el modelo actualizado, con deuda por venta, trazabilidad por certificado a través de `venta_certificado`, y la flexibilidad para pagos parciales, amortizaciones y conversión de saldos en cuotas.
+> Este bosquejo y los ejemplos reflejan el modelo actualizado, con deuda por venta, trazabilidad por certificado a través de `venta_certificado`, y la flexibilidad para pagos parciales y amortizaciones, sin cuotas ni financiamiento.

@@ -165,13 +165,6 @@
 
 ## Pagos y Moras
 - pago, pago_deuda, deuda, politica_mora, proveedor, punto_venta
-# Ejemplos de Flujos para Procesos Esenciales
-
-## 0. Crédito (Límite de Certificados)
-1. El proveedor define el crédito máximo para cada punto de venta (`credito`).
-2. El distribuidor asigna certificados a un punto de venta, respetando el límite de crédito disponible (stock_actual < limite_credito).
-3. Cuando el PV vende certificados, el stock_actual disminuye; cuando recibe nuevas asignaciones, aumenta (sin exceder el límite).
-4. El proveedor puede modificar el crédito según su política.
 
 ## Visitas
 - visita, proveedor, distribuidor, punto_venta
@@ -184,8 +177,13 @@
 
 ---
 
-
 # Ejemplos de Flujos para Procesos Esenciales
+
+## 0. Crédito (Límite de Certificados)
+1. El proveedor define el crédito máximo para cada punto de venta (`credito`).
+2. El distribuidor asigna certificados a un punto de venta, respetando el límite de crédito disponible (stock_actual < limite_credito).
+3. Cuando el PV vende certificados, el stock_actual disminuye; cuando recibe nuevas asignaciones, aumenta (sin exceder el límite).
+4. El proveedor puede modificar el crédito según su política.
 
 ## 1. Registro de Punto de Venta (PV)
 1. El distribuidor registra un nuevo punto de venta en el sistema (`punto_venta`).

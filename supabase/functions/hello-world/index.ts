@@ -5,7 +5,7 @@
 // Setup type definitions for built-in Supabase Runtime APIs
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { http200, http500, withCors } from "shared/utils/http.ts";
-import { getSupabaseClient } from "shared/utils/client.ts";
+import { getSupabaseClient } from "shared/utils/supabase.ts";
 // import { withAuth } from "shared/utils/supabase.ts"; // Descomenta y envuelve el handler si quieres exigir auth
 
 console.log("Hello from Functions!");

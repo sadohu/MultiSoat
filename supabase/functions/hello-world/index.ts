@@ -4,40 +4,27 @@
 
 // Setup type definitions for built-in Supabase Runtime APIs
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
-import { createClient } from "jsr:@supabase/supabase-js";
-import type { Database } from "shared/config/supabase.ts";
+import { http200, http500, withCors } from "shared/utils/http.ts";
+import { getSupabaseClient } from "shared/utils/client.ts";
+// import { withAuth } from "shared/utils/supabase.ts"; // Descomenta y envuelve el handler si quieres exigir auth
 
 console.log("Hello from Functions!");
 
-Deno.serve(async (req) => {
-  // Cliente tipado, usando variables de entorno inyectadas por Supabase
-  const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-  const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+// Endpoint PUBLICO por defecto. Para protegerlo:
+//   Deno.serve(withCors(withAuth(async (req, { user, supabase }) => { ... })));
+// Y configura en el dashboard que la función requiera verificación JWT si aplica.
 
-  const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
-    global: {
-      headers: { Authorization: req.headers.get("Authorization") ?? "" },
-    },
-  });
-
-  // Parseo seguro del body
-  let name = "World";
+Deno.serve(withCors(async (req: Request) => {
   try {
-    const body = await req.json();
-    if (body?.name && typeof body.name === "string") name = body.name;
-  } catch (_) {
-    // body vacío o no-JSON
+    const supabase = getSupabaseClient(req);
+    const body = await req.json().catch(() => ({}));
+    const name = typeof body?.name === "string" ? body.name : "World";
+    await supabase.from("proveedor").select("id").limit(0);
+    return http200({ message: `Hello ${name}!` });
+  } catch (e) {
+    return http500("Unhandled error", String(e));
   }
-
-  // Ejemplo mínimo para usar el cliente y evitar warning de variable sin uso
-  await supabase.from("proveedor").select("id").limit(0);
-
-  const data = { message: `Hello ${name}!` };
-
-  return new Response(JSON.stringify(data), {
-    headers: { "Content-Type": "application/json" },
-  });
-});
+}));
 
 /* To invoke locally:
 

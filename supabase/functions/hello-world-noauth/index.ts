@@ -1,10 +1,9 @@
-
-import "@supabase/functions-js/edge-runtime.d.ts";
-import { http200, http400 } from "@utils/httpResponse.ts";
+import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+import { http200, http400, withCors } from "shared/utils/http.ts";
 
 console.log("Hello from hello-world-noauth!");
 
-Deno.serve(async (req) => {
+Deno.serve(withCors(async (req) => {
   let name = "World";
   try {
     const body = await req.json();
@@ -14,6 +13,6 @@ Deno.serve(async (req) => {
     return http200({ message: `Hello ${name}!` });
   } catch (err) {
     // Ejemplo de respuesta de error por body inválido
-    return http400("Body inválido o no-JSON", { error: err?.message });
+    return http400("Body inválido o no-JSON", (err as Error)?.message);
   }
-});
+}));

@@ -347,3 +347,9 @@ enabled = true
 verify_jwt = false
 import_map = "./functions/hello-world-noauth/deno.json"
 entrypoint = "./functions/hello-world-noauth/index.ts"
+
+[functions.proveedor]
+enabled = true
+verify_jwt = false
+import_map = "./functions/proveedor/deno.json"
+entrypoint = "./functions/proveedor/index.ts"

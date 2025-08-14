@@ -8,7 +8,7 @@ Esta carpeta contiene utilidades reutilizables para Edge Functions de Supabase, 
 shared/utils/
 ├── README.md           # Esta documentación  
 ├── http.ts            # Respuestas HTTP y CORS
-├── supabase.ts        # Cliente Supabase + Auth helpers
+├── client-auth.ts     # Cliente Supabase + Auth helpers
 ├── Validator.ts       # Validaciones peruanas
 └── examples/          # Ejemplos de uso
     ├── basic-response.ts
@@ -18,7 +18,8 @@ shared/utils/
 
 ## ✨ Cambios Recientes (Optimización)
 
-**Eliminado:** `client.ts` - Su funcionalidad se integró en `supabase.ts`  
+**Eliminado:** `client.ts` - Su funcionalidad se integró en `client-auth.ts`  
+**Renombrado:** `supabase.ts` → `client-auth.ts` (evitar confusión con dashboard)  
 **Integrado:** Types oficiales del dashboard (`../config/supabase.ts`)  
 **Mejorado:** Cliente Supabase con tipado completo desde el dashboard  
 **Simplificado:** Un solo archivo para cliente y autenticación
@@ -81,11 +82,11 @@ Deno.serve(withCors(async (req) => {
 }));
 ```
 
-## 🔐 Supabase Client + Auth (`supabase.ts`)
+## 🔐 Supabase Client + Auth (`client-auth.ts`)
 
 ### Crear Cliente Tipado
 ```typescript
-import { getSupabaseClient } from "shared/utils/supabase.ts";
+import { getSupabaseClient } from "shared/utils/client-auth.ts";
 
 // En tu Edge Function
 const supabase = getSupabaseClient(req);
@@ -104,7 +105,7 @@ const { data, error } = await supabase
 
 ### Verificación Manual
 ```typescript
-import { requireAuth } from "shared/utils/supabase.ts";
+import { requireAuth } from "shared/utils/client-auth.ts";
 
 const authResult = await requireAuth(req);
 if (!authResult.success) {
@@ -115,7 +116,7 @@ if (!authResult.success) {
 
 ### Middleware de Autenticación
 ```typescript
-import { withAuth } from "shared/utils/supabase.ts";
+import { withAuth } from "shared/utils/client-auth.ts";
 
 // Protege toda la función
 Deno.serve(withCors(withAuth(async (req, { user, supabase }) => {
@@ -186,7 +187,7 @@ Deno.serve(withCors(async (req) => {
 ### 2. Función con Base de Datos
 ```typescript
 import { withCors, http200, http500 } from "shared/utils/http.ts";
-import { getSupabaseClient } from "shared/utils/supabase.ts";
+import { getSupabaseClient } from "shared/utils/client-auth.ts";
 
 Deno.serve(withCors(async (req) => {
   try {

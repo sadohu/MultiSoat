@@ -8,6 +8,27 @@ Edge Function para el **CRUD completo de proveedores** en el sistema MultiSoat. 
 - **CORS**: Habilitado automáticamente
 - **Métodos HTTP**: GET, POST, PUT, DELETE
 - **Tabla de datos**: `proveedor`
+- **Códigos HTTP**: Correctamente implementados (200, 400, 404, 500)
+- **Arquitectura**: Queries separadas para count y datos (evita conflictos JSON)
+
+## ⚡ Características Técnicas
+
+### 🔄 **Paginación Optimizada**
+- **Estrategia de doble query**: Primero obtiene el `count`, luego los datos
+- **Validación anticipada**: Verifica páginas válidas antes de consultar datos
+- **Prevención de errores**: Evita JSON malformado en responses de Supabase
+
+### 🔒 **Validaciones Robustas**
+- **Documentos Peruanos**: RUC (11 dígitos), DNI (8 dígitos), CE (12 dígitos)
+- **Email**: Formato RFC válido
+- **Teléfono**: 9 dígitos, comenzando con 9
+- **Parámetros**: Sanitización de caracteres especiales en búsquedas
+
+### 🌐 **HTTP Status Codes**
+- **200 OK**: Operaciones exitosas
+- **400 Bad Request**: Errores de validación, parámetros inválidos, páginas inexistentes
+- **404 Not Found**: Recurso no encontrado
+- **500 Internal Server Error**: Errores de servidor/base de datos
 
 ## 📋 Modelo de Datos
 
@@ -44,18 +65,24 @@ interface ProveedorData {
 Lista todos los proveedores con paginación y filtros opcionales.
 
 #### Query Parameters:
-- `page`: número de página (default: 1)
-- `limit`: proveedores por página (default: 10)
+- `page`: número de página (default: 1, min: 1)
+- `limit`: proveedores por página (default: 10, min: 1, max: 100)
 - `search`: búsqueda por nombre, razón social o documento
 - `estado`: filtrar por estado ("activo", "inactivo")
 - `tipo_documento`: filtrar por tipo ("RUC", "DNI", "CE")
 
+#### Validaciones de Paginación:
+- Si `page` es menor a 1 o no es un número: Error 400
+- Si `limit` es menor a 1, mayor a 100, o no es un número: Error 400
+- Si se solicita una página que no existe: Error 400 con mensaje informativo
+- Si no hay resultados: Response 200 con array vacío y mensaje explicativo
+
 #### Ejemplo de Request:
 ```bash
-curl "https://your-project.supabase.co/functions/v1/proveedor?page=1&limit=5&search=ACME&estado=activo"
+curl "https://wtaqmoxytfnxsggxqdhx.supabase.co/functions/v1/proveedor?page=1&limit=5&search=ACME&estado=activo"
 ```
 
-#### Ejemplo de Response:
+#### Ejemplo de Response exitoso:
 ```json
 {
   "data": {
@@ -78,17 +105,61 @@ curl "https://your-project.supabase.co/functions/v1/proveedor?page=1&limit=5&sea
       "page": 1,
       "limit": 5,
       "total": 1,
-      "totalPages": 1
+      "totalPages": 1,
+      "hasNextPage": false,
+      "hasPrevPage": false
     },
     "filters": {
       "search": "ACME",
       "estado": "activo",
       "tipo_documento": ""
-    }
+    },
+    "message": "Se encontraron 1 proveedor(es). Mostrando página 1 de 1."
   },
   "success": true,
   "status": 200
 }
+```
+
+#### Ejemplo de Response sin resultados:
+```json
+{
+  "data": {
+    "proveedores": [],
+    "pagination": {
+      "page": 1,
+      "limit": 10,
+      "total": 0,
+      "totalPages": 0,
+      "hasNextPage": false,
+      "hasPrevPage": false
+    },
+    "filters": {
+      "search": "NoExiste",
+      "estado": "",
+      "tipo_documento": ""
+    },
+    "message": "No se encontraron proveedores con los filtros aplicados"
+  },
+  "success": true,
+  "status": 200
+}
+```
+
+#### Ejemplo de Error de paginación:
+```json
+{
+  "error": "La página 5 no existe. Solo hay 2 página(s) disponible(s) con 15 registro(s) total(es).",
+  "success": false,
+  "status": 400
+}
+```
+
+**📌 Nota Importante**: Con las mejoras implementadas, este error ahora:
+- ✅ Devuelve código HTTP 400 real (no 200)
+- ✅ Proporciona mensaje claro y específico
+- ✅ No genera errores JSON malformados
+- ✅ Se valida antes de ejecutar queries innecesarias
 ```
 
 ### 2. **GET /proveedor/{id}** - Obtener proveedor específico
@@ -96,7 +167,7 @@ Obtiene los datos de un proveedor por su ID.
 
 #### Ejemplo de Request:
 ```bash
-curl "https://your-project.supabase.co/functions/v1/proveedor/1"
+curl "https://wtaqmoxytfnxsggxqdhx.supabase.co/functions/v1/proveedor/1"
 ```
 
 #### Ejemplo de Response:
@@ -126,7 +197,7 @@ Crea un nuevo proveedor con validaciones completas.
 
 #### Ejemplo de Request:
 ```bash
-curl -X POST "https://your-project.supabase.co/functions/v1/proveedor" \
+curl -X POST "https://wtaqmoxytfnxsggxqdhx.supabase.co/functions/v1/proveedor" \
   -H "Content-Type: application/json" \
   -d '{
     "nombre": "Tech Solutions",
@@ -166,7 +237,7 @@ Actualiza los datos de un proveedor existente.
 
 #### Ejemplo de Request:
 ```bash
-curl -X PUT "https://your-project.supabase.co/functions/v1/proveedor/2" \
+curl -X PUT "https://wtaqmoxytfnxsggxqdhx.supabase.co/functions/v1/proveedor/2" \
   -H "Content-Type: application/json" \
   -d '{
     "nombre": "Tech Solutions Pro",
@@ -201,7 +272,7 @@ Realiza un "soft delete" cambiando el estado a "inactivo".
 
 #### Ejemplo de Request:
 ```bash
-curl -X DELETE "https://your-project.supabase.co/functions/v1/proveedor/2"
+curl -X DELETE "https://wtaqmoxytfnxsggxqdhx.supabase.co/functions/v1/proveedor/2"
 ```
 
 #### Ejemplo de Response:
@@ -432,15 +503,63 @@ pm.test("Error response structure", function () {
 5. **Documento duplicado** → POST con mismo número_documento (esperado: 400)
 6. **Campos requeridos** → POST sin `tipo_documento` (esperado: 400)
 
-#### 🔍 Tests de Filtros
+#### 🔍 Tests de Filtros y Paginación
 1. **Buscar por nombre** → GET `/proveedor?search=Lima`
 2. **Filtrar por estado** → GET `/proveedor?estado=activo`
 3. **Filtrar por tipo documento** → GET `/proveedor?tipo_documento=RUC`
-4. **Paginación** → GET `/proveedor?page=1&limit=5`
+4. **Paginación página 1** → GET `/proveedor?page=1&limit=5`
+5. **Paginación página inexistente** → GET `/proveedor?page=99&limit=10` (esperado: 400)
+6. **Parámetros inválidos** → GET `/proveedor?page=0&limit=abc` (esperado: 400)
+7. **Límite excedido** → GET `/proveedor?limit=200` (esperado: 400)
+8. **Sin resultados con filtros** → GET `/proveedor?search=NoExiste` (esperado: 200 con array vacío)
 
 #### 🚫 Tests de Errores
 1. **ID inexistente** → GET `/proveedor/9999` (esperado: 404)
 2. **Actualizar inexistente** → PUT `/proveedor/9999` (esperado: 404)
+
+## 📝 Comandos de Test Rápido
+
+### **Test de Códigos HTTP Corregidos** ✅
+```bash
+# Test 1: Error 400 (parámetro inválido) - Ahora devuelve HTTP 400 real
+curl -i "https://wtaqmoxytfnxsggxqdhx.supabase.co/functions/v1/proveedor?page=0"
+# Esperado: HTTP/1.1 400 Bad Request
+
+# Test 2: Error 400 (página inexistente) - Ahora devuelve HTTP 400 real  
+curl -i "https://wtaqmoxytfnxsggxqdhx.supabase.co/functions/v1/proveedor?page=2&limit=10"
+# Esperado: HTTP/1.1 400 Bad Request + mensaje claro
+
+# Test 3: Éxito - Devuelve HTTP 200
+curl -i "https://wtaqmoxytfnxsggxqdhx.supabase.co/functions/v1/proveedor?page=1&limit=10"
+# Esperado: HTTP/1.1 200 OK
+```
+
+### Test de Paginación Mejorada
+```bash
+# 1. Crear un proveedor primero
+curl -X POST "https://wtaqmoxytfnxsggxqdhx.supabase.co/functions/v1/proveedor" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "nombre": "Test Corp",
+    "razon_social": "Test Corporation S.A.C.", 
+    "tipo_documento": "RUC",
+    "numero_documento": "12345678901",
+    "email": "test@test.com",
+    "telefono": "987654321"
+  }'
+
+# 2. Listar página 1 (debería funcionar)
+curl "https://wtaqmoxytfnxsggxqdhx.supabase.co/functions/v1/proveedor?page=1&limit=10"
+
+# 3. Intentar página 2 (debería dar error claro si solo hay 1 registro)
+curl "https://wtaqmoxytfnxsggxqdhx.supabase.co/functions/v1/proveedor?page=2&limit=10"
+
+# 4. Test de validación de parámetros
+curl "https://wtaqmoxytfnxsggxqdhx.supabase.co/functions/v1/proveedor?page=0&limit=200"
+
+# 5. Test sin resultados
+curl "https://wtaqmoxytfnxsggxqdhx.supabase.co/functions/v1/proveedor?search=NoExiste"
+```
 3. **Eliminar inexistente** → DELETE `/proveedor/9999` (esperado: 404)
 4. **Método no permitido** → PATCH `/proveedor` (esperado: 400)
 
@@ -480,6 +599,69 @@ Después de completar todos los tests, deberías poder:
 - ✅ Listar y filtrar proveedores eficientemente
 - ✅ Actualizar información de proveedores existentes
 - ✅ Eliminar proveedores (soft delete)
+- ✅ Recibir códigos HTTP correctos (400, 404, 500)
+- ✅ Manejar paginación sin errores JSON malformados
+
+## 🚀 **Historial de Mejoras**
+
+### **v2.1 - Arquitectura Optimizada (Agosto 2025)**
+- **🔧 Códigos HTTP Corregidos**: Los errores 400/500 ahora devuelven códigos HTTP reales (no 200)
+- **⚡ Paginación Mejorada**: Queries separadas previenen errores JSON malformados de Supabase
+- **🧹 Código Limpio**: Eliminación de logs de debugging innecesarios
+- **🔒 Validación Robusta**: Manejo mejorado de errores y sanitización de parámetros
+
+### **Correcciones Técnicas Implementadas:**
+1. **withHeaders() Fix**: Preserva `status` y `statusText` en respuestas CORS
+2. **Doble Query Strategy**: Count separado de datos para evitar conflictos
+3. **Error Handling**: Detección y manejo de JSON malformado de Supabase
+4. **Parameter Sanitization**: Limpieza de caracteres especiales en búsquedas
+
+### **URL de Deployment Actual:**
+```
+https://wtaqmoxytfnxsggxqdhx.supabase.co/functions/v1/proveedor
+```
+
+### **Estado del Proyecto:**
+- ✅ **Funcionalidad**: CRUD completo operativo
+- ✅ **HTTP Codes**: Funcionando correctamente
+- ✅ **Validaciones**: Documentos peruanos implementados
+- ✅ **Paginación**: Sin errores JSON malformados
+- ✅ **CORS**: Configurado y funcionando
+- ✅ **Tests**: Todos los casos de prueba superados
+
+## 🛠️ **Troubleshooting**
+
+### **Problema: Códigos HTTP siempre 200**
+**Síntoma**: Errores 400/500 llegan como HTTP 200
+**Causa**: `withHeaders()` no preservaba `status` original
+**Solución**: 
+```typescript
+// ❌ Antes
+return new Response(res.body, { ...res, headers });
+
+// ✅ Después  
+return new Response(res.body, { 
+    status: res.status,
+    statusText: res.statusText,
+    headers 
+});
+```
+
+### **Problema: JSON malformado en paginación**
+**Síntoma**: `error.message: '{"'` (JSON truncado)
+**Causa**: Query con `count: "exact"` + `range()` causa conflicto en Supabase
+**Solución**: Separar en dos queries:
+1. Primera query: Solo count con `head: true`
+2. Segunda query: Solo datos con paginación
+
+### **Problema: Páginas inexistentes dan error 500**
+**Síntoma**: `page=2` con 1 registro da error 500
+**Causa**: Validación tardía después de ejecutar query problemática
+**Solución**: Validar páginas **antes** de consultar datos
+
+### **Enlaces Útiles**
+- **Dashboard Functions**: https://supabase.com/dashboard/project/wtaqmoxytfnxsggxqdhx/functions
+- **Logs en Tiempo Real**: https://supabase.com/dashboard/project/wtaqmoxytfnxsggxqdhx/logs/edge-functions
 - ✅ Manejar errores apropiadamente
 - ✅ Confirmar que todas las validaciones funcionan
 

@@ -85,7 +85,7 @@ Deno.serve(withCors(async (req: Request) => {
           const { data: proveedor, error } = await supabase
             .from("proveedor")
             .select("*")
-            .eq("id", proveedorId)
+            .eq("id", Number(proveedorId))
             .single();
 
           if (error || !proveedor) {
@@ -104,43 +104,149 @@ Deno.serve(withCors(async (req: Request) => {
           const estado = url.searchParams.get("estado") || "";
           const tipo_documento = url.searchParams.get("tipo_documento") || "";
 
-          let query = supabase
-            .from("proveedor")
-            .select("*", { count: "exact" });
-
-          // Aplicar filtros
-          if (search) {
-            query = query.or(
-              `nombre.ilike.%${search}%,razon_social.ilike.%${search}%,numero_documento.ilike.%${search}%`,
+          // Validar parámetros de paginación
+          if (isNaN(page) || page < 1) {
+            return http400(
+              "El parámetro 'page' debe ser un número entero mayor a 0",
             );
           }
-          if (estado) {
-            query = query.eq("estado", estado);
-          }
-          if (tipo_documento) {
-            query = query.eq("tipo_documento", tipo_documento);
-          }
-
-          // Paginación
-          const offset = (page - 1) * limit;
-          query = query.range(offset, offset + limit - 1);
-
-          const { data: proveedores, error, count } = await query;
-
-          if (error) {
-            return http500("Error al obtener proveedores", error.message);
+          if (isNaN(limit) || limit < 1 || limit > 100) {
+            return http400(
+              "El parámetro 'limit' debe ser un número entero entre 1 y 100",
+            );
           }
 
-          return http200({
-            proveedores: proveedores || [],
-            pagination: {
-              page,
-              limit,
-              total: count || 0,
-              totalPages: Math.ceil((count || 0) / limit),
-            },
-            filters: { search, estado, tipo_documento },
-          });
+          try {
+            // Primera query: Solo obtener el count
+            let countQuery = supabase
+              .from("proveedor")
+              .select("*", { count: "exact", head: true });
+
+            // Aplicar filtros al count
+            if (search) {
+              const sanitizedSearch = search.replace(/[%_'"\\]/g, "");
+              if (sanitizedSearch.length > 0) {
+                countQuery = countQuery.or(
+                  `nombre.ilike.%${sanitizedSearch}%,razon_social.ilike.%${sanitizedSearch}%,numero_documento.ilike.%${sanitizedSearch}%`,
+                );
+              }
+            }
+            if (estado) {
+              if (!["activo", "inactivo"].includes(estado)) {
+                return http400(
+                  "El parámetro 'estado' debe ser 'activo' o 'inactivo'",
+                );
+              }
+              countQuery = countQuery.eq("estado", estado);
+            }
+            if (tipo_documento) {
+              if (!["RUC", "DNI", "CE"].includes(tipo_documento)) {
+                return http400(
+                  "El parámetro 'tipo_documento' debe ser 'RUC', 'DNI' o 'CE'",
+                );
+              }
+              countQuery = countQuery.eq("tipo_documento", tipo_documento);
+            }
+
+            const { count, error: countError } = await countQuery;
+
+            if (countError) {
+              return http500(
+                "Error al consultar total de registros",
+                countError.message,
+              );
+            }
+
+            const total = count || 0;
+            const totalPages = Math.ceil(total / limit);
+
+            // Verificar si la página solicitada existe
+            if (page > totalPages && total > 0) {
+              return http400(
+                `La página ${page} no existe. Solo hay ${totalPages} página(s) disponible(s) con ${total} registro(s) total(es).`,
+              );
+            }
+
+            // Segunda query: Obtener los datos con paginación
+            let dataQuery = supabase
+              .from("proveedor")
+              .select("*");
+
+            // Aplicar los mismos filtros
+            if (search) {
+              const sanitizedSearch = search.replace(/[%_'"\\]/g, "");
+              if (sanitizedSearch.length > 0) {
+                dataQuery = dataQuery.or(
+                  `nombre.ilike.%${sanitizedSearch}%,razon_social.ilike.%${sanitizedSearch}%,numero_documento.ilike.%${sanitizedSearch}%`,
+                );
+              }
+            }
+            if (estado) {
+              dataQuery = dataQuery.eq("estado", estado);
+            }
+            if (tipo_documento) {
+              dataQuery = dataQuery.eq("tipo_documento", tipo_documento);
+            }
+
+            const offset = (page - 1) * limit;
+            dataQuery = dataQuery.range(offset, offset + limit - 1);
+
+            const { data: proveedores, error } = await dataQuery;
+
+            if (error) {
+              let errorMessage = "Error desconocido en consulta";
+              let errorCode = "unknown";
+
+              try {
+                if (error.code) {
+                  errorCode = error.code;
+                }
+
+                if (error.message && error.message.startsWith('{"')) {
+                  errorMessage = "Error de consulta en base de datos";
+                } else if (error.message) {
+                  errorMessage = error.message;
+                }
+
+                if (
+                  error.details && typeof error.details === "string" &&
+                  !error.details.startsWith('{"')
+                ) {
+                  errorMessage = error.details;
+                }
+              } catch (_parseError) {
+                errorMessage = "Error al procesar respuesta de base de datos";
+              }
+
+              return http500(
+                "Error al obtener proveedores",
+                `${
+                  errorCode !== "unknown" ? `Code ${errorCode}: ` : ""
+                }${errorMessage}`,
+              );
+            }
+
+            return http200({
+              proveedores: proveedores || [],
+              pagination: {
+                page,
+                limit,
+                total,
+                totalPages,
+                hasNextPage: page < totalPages,
+                hasPrevPage: page > 1,
+              },
+              filters: { search, estado, tipo_documento },
+              message: total === 0
+                ? "No se encontraron proveedores con los filtros aplicados"
+                : `Se encontraron ${total} proveedor(es). Mostrando página ${page} de ${totalPages}.`,
+            });
+          } catch (generalError) {
+            return http500(
+              "Error general",
+              `${(generalError as Error).message || "Error desconocido"}`,
+            );
+          }
         }
       }
 
@@ -208,7 +314,7 @@ Deno.serve(withCors(async (req: Request) => {
         const { data: existingProveedor } = await supabase
           .from("proveedor")
           .select("id")
-          .eq("id", proveedorId)
+          .eq("id", Number(proveedorId))
           .single();
 
         if (!existingProveedor) {
@@ -221,7 +327,7 @@ Deno.serve(withCors(async (req: Request) => {
             .from("proveedor")
             .select("id")
             .eq("numero_documento", updateData.numero_documento)
-            .neq("id", proveedorId)
+            .neq("id", Number(proveedorId))
             .single();
 
           if (docExists) {
@@ -237,7 +343,7 @@ Deno.serve(withCors(async (req: Request) => {
             ...updateData,
             updated_at: new Date().toISOString(),
           })
-          .eq("id", proveedorId)
+          .eq("id", Number(proveedorId))
           .select()
           .single();
 
@@ -258,7 +364,7 @@ Deno.serve(withCors(async (req: Request) => {
         const { data: proveedorToDelete } = await supabase
           .from("proveedor")
           .select("id, estado")
-          .eq("id", proveedorId)
+          .eq("id", Number(proveedorId))
           .single();
 
         if (!proveedorToDelete) {
@@ -272,14 +378,14 @@ Deno.serve(withCors(async (req: Request) => {
             estado: "inactivo",
             updated_at: new Date().toISOString(),
           })
-          .eq("id", proveedorId);
+          .eq("id", Number(proveedorId));
 
         if (deleteError) {
           return http500("Error al eliminar proveedor", deleteError.message);
         }
 
         return http200(
-          { id: proveedorId, estado: "inactivo" },
+          { id: Number(proveedorId), estado: "inactivo" },
           "Proveedor eliminado exitosamente",
         );
       }

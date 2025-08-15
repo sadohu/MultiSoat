@@ -166,7 +166,11 @@ export function withCors(
 // Utilidades de headers
 export function withHeaders(res: Response, extra: HeadersInit): Response {
     const headers = mergeHeaders(res.headers, extra);
-    return new Response(res.body, { ...res, headers });
+    return new Response(res.body, {
+        status: res.status,
+        statusText: res.statusText,
+        headers,
+    });
 }
 
 export function mergeHeaders(

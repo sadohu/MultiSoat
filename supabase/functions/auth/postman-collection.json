@@ -1,0 +1,500 @@
+{
+    "info": {
+        "name": "MultiSoat Auth API",
+        "description": "Colección de pruebas para la API de autenticación de MultiSoat",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "https://wtaqmoxytfnxsggxqdhx.supabase.co/functions/v1",
+            "type": "string"
+        },
+        {
+            "key": "access_token",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "refresh_token",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "user_id",
+            "value": "",
+            "type": "string"
+        }
+    ],
+    "item": [
+        {
+            "name": "1. Register User",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"email\": \"test@multisoat.com\",\n  \"password\": \"123456\",\n  \"nombre\": \"Juan\",\n  \"apellido\": \"Pérez\",\n  \"rol\": \"usuario\"\n}"
+                },
+                "url": {
+                    "raw": "{{base_url}}/auth/register",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "auth",
+                        "register"
+                    ]
+                }
+            },
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "// Test de status 200",
+                            "pm.test(\"Status code is 200\", function () {",
+                            "    pm.response.to.have.status(200);",
+                            "});",
+                            "",
+                            "// Test de estructura de respuesta",
+                            "pm.test(\"Response has success true\", function () {",
+                            "    const jsonData = pm.response.json();",
+                            "    pm.expect(jsonData.success).to.eql(true);",
+                            "});",
+                            "",
+                            "// Guardar tokens automáticamente",
+                            "if (pm.response.code === 200) {",
+                            "    const response = pm.response.json();",
+                            "    if (response.data.session) {",
+                            "        pm.collectionVariables.set(\"access_token\", response.data.session.access_token);",
+                            "        pm.collectionVariables.set(\"refresh_token\", response.data.session.refresh_token);",
+                            "    }",
+                            "    if (response.data.user) {",
+                            "        pm.collectionVariables.set(\"user_id\", response.data.user.id);",
+                            "    }",
+                            "}",
+                            "",
+                            "// Test de datos de usuario",
+                            "pm.test(\"User data exists\", function () {",
+                            "    const jsonData = pm.response.json();",
+                            "    pm.expect(jsonData.data.user).to.have.property(\"email\");",
+                            "    pm.expect(jsonData.data.user).to.have.property(\"id\");",
+                            "    pm.expect(jsonData.data.user).to.have.property(\"nombre\");",
+                            "});"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "2. Login User",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"email\": \"test@multisoat.com\",\n  \"password\": \"123456\"\n}"
+                },
+                "url": {
+                    "raw": "{{base_url}}/auth/login",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "auth",
+                        "login"
+                    ]
+                }
+            },
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test(\"Status code is 200\", function () {",
+                            "    pm.response.to.have.status(200);",
+                            "});",
+                            "",
+                            "pm.test(\"Login successful\", function () {",
+                            "    const jsonData = pm.response.json();",
+                            "    pm.expect(jsonData.success).to.eql(true);",
+                            "    pm.expect(jsonData.data.message).to.include(\"exitosa\");",
+                            "});",
+                            "",
+                            "// Actualizar tokens",
+                            "if (pm.response.code === 200) {",
+                            "    const response = pm.response.json();",
+                            "    if (response.data.session) {",
+                            "        pm.collectionVariables.set(\"access_token\", response.data.session.access_token);",
+                            "        pm.collectionVariables.set(\"refresh_token\", response.data.session.refresh_token);",
+                            "    }",
+                            "}",
+                            "",
+                            "pm.test(\"Session data exists\", function () {",
+                            "    const jsonData = pm.response.json();",
+                            "    pm.expect(jsonData.data.session).to.have.property(\"access_token\");",
+                            "    pm.expect(jsonData.data.session).to.have.property(\"refresh_token\");",
+                            "});"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "3. Verify Token",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"token\": \"{{access_token}}\"\n}"
+                },
+                "url": {
+                    "raw": "{{base_url}}/auth/verify",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "auth",
+                        "verify"
+                    ]
+                }
+            },
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test(\"Status code is 200\", function () {",
+                            "    pm.response.to.have.status(200);",
+                            "});",
+                            "",
+                            "pm.test(\"Token is valid\", function () {",
+                            "    const jsonData = pm.response.json();",
+                            "    pm.expect(jsonData.success).to.eql(true);",
+                            "    pm.expect(jsonData.data.valid).to.eql(true);",
+                            "});",
+                            "",
+                            "pm.test(\"User data returned\", function () {",
+                            "    const jsonData = pm.response.json();",
+                            "    pm.expect(jsonData.data.user).to.have.property(\"email\");",
+                            "    pm.expect(jsonData.data.user).to.have.property(\"id\");",
+                            "});"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "4. Auth Status (GET)",
+            "request": {
+                "method": "GET",
+                "header": [
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{access_token}}"
+                    }
+                ],
+                "url": {
+                    "raw": "{{base_url}}/auth/status",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "auth",
+                        "status"
+                    ]
+                }
+            },
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test(\"Status code is 200\", function () {",
+                            "    pm.response.to.have.status(200);",
+                            "});",
+                            "",
+                            "pm.test(\"User is authenticated\", function () {",
+                            "    const jsonData = pm.response.json();",
+                            "    pm.expect(jsonData.success).to.eql(true);",
+                            "    pm.expect(jsonData.data.authenticated).to.eql(true);",
+                            "});",
+                            "",
+                            "pm.test(\"User data complete\", function () {",
+                            "    const jsonData = pm.response.json();",
+                            "    pm.expect(jsonData.data.user).to.have.property(\"email\");",
+                            "    pm.expect(jsonData.data.user).to.have.property(\"created_at\");",
+                            "});"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "5. Refresh Token",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"refresh_token\": \"{{refresh_token}}\"\n}"
+                },
+                "url": {
+                    "raw": "{{base_url}}/auth/refresh",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "auth",
+                        "refresh"
+                    ]
+                }
+            },
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test(\"Status code is 200\", function () {",
+                            "    pm.response.to.have.status(200);",
+                            "});",
+                            "",
+                            "pm.test(\"Token refreshed successfully\", function () {",
+                            "    const jsonData = pm.response.json();",
+                            "    pm.expect(jsonData.success).to.eql(true);",
+                            "    pm.expect(jsonData.data.message).to.include(\"renovado\");",
+                            "});",
+                            "",
+                            "// Actualizar tokens",
+                            "if (pm.response.code === 200) {",
+                            "    const response = pm.response.json();",
+                            "    if (response.data.session) {",
+                            "        pm.collectionVariables.set(\"access_token\", response.data.session.access_token);",
+                            "        pm.collectionVariables.set(\"refresh_token\", response.data.session.refresh_token);",
+                            "    }",
+                            "}",
+                            "",
+                            "pm.test(\"New session data exists\", function () {",
+                            "    const jsonData = pm.response.json();",
+                            "    pm.expect(jsonData.data.session).to.have.property(\"access_token\");",
+                            "    pm.expect(jsonData.data.session).to.have.property(\"refresh_token\");",
+                            "});"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "6. Logout",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"token\": \"{{access_token}}\"\n}"
+                },
+                "url": {
+                    "raw": "{{base_url}}/auth/logout",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "auth",
+                        "logout"
+                    ]
+                }
+            },
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test(\"Status code is 200\", function () {",
+                            "    pm.response.to.have.status(200);",
+                            "});",
+                            "",
+                            "pm.test(\"Logout successful\", function () {",
+                            "    const jsonData = pm.response.json();",
+                            "    pm.expect(jsonData.success).to.eql(true);",
+                            "    pm.expect(jsonData.data.message).to.include(\"cerrada\");",
+                            "});",
+                            "",
+                            "// Limpiar tokens",
+                            "pm.collectionVariables.set(\"access_token\", \"\");",
+                            "pm.collectionVariables.set(\"refresh_token\", \"\");",
+                            "pm.collectionVariables.set(\"user_id\", \"\");"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "ERROR - Invalid Email",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"email\": \"invalid-email\",\n  \"password\": \"123456\"\n}"
+                },
+                "url": {
+                    "raw": "{{base_url}}/auth/register",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "auth",
+                        "register"
+                    ]
+                }
+            },
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test(\"Status code is 400\", function () {",
+                            "    pm.response.to.have.status(400);",
+                            "});",
+                            "",
+                            "pm.test(\"Error message for invalid email\", function () {",
+                            "    const jsonData = pm.response.json();",
+                            "    pm.expect(jsonData.success).to.eql(false);",
+                            "    pm.expect(jsonData.error).to.include(\"email\");",
+                            "});"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "ERROR - Weak Password",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"email\": \"test@multisoat.com\",\n  \"password\": \"123\"\n}"
+                },
+                "url": {
+                    "raw": "{{base_url}}/auth/register",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "auth",
+                        "register"
+                    ]
+                }
+            },
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test(\"Status code is 400\", function () {",
+                            "    pm.response.to.have.status(400);",
+                            "});",
+                            "",
+                            "pm.test(\"Error message for weak password\", function () {",
+                            "    const jsonData = pm.response.json();",
+                            "    pm.expect(jsonData.success).to.eql(false);",
+                            "    pm.expect(jsonData.error).to.include(\"contraseña\");",
+                            "});"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "ERROR - Invalid Login",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"email\": \"wrong@email.com\",\n  \"password\": \"wrongpassword\"\n}"
+                },
+                "url": {
+                    "raw": "{{base_url}}/auth/login",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "auth",
+                        "login"
+                    ]
+                }
+            },
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test(\"Status code is 401\", function () {",
+                            "    pm.response.to.have.status(401);",
+                            "});",
+                            "",
+                            "pm.test(\"Error message for invalid credentials\", function () {",
+                            "    const jsonData = pm.response.json();",
+                            "    pm.expect(jsonData.success).to.eql(false);",
+                            "    pm.expect(jsonData.error).to.include(\"Credenciales\");",
+                            "});"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ]
+        }
+    ]
+}

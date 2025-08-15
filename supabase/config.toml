@@ -353,3 +353,10 @@ enabled = true
 verify_jwt = false
 import_map = "./functions/proveedor/deno.json"
 entrypoint = "./functions/proveedor/index.ts"
+
+[functions.auth]
+enabled = true
+verify_jwt = false
+import_map = "./functions/auth/deno.json"
+entrypoint = "./functions/auth/index.ts"
+

@@ -1,7 +1,0 @@
-{
-  "imports": {
-    "@utils/": "../shared/utils/",
-    "@config/": "../shared/config/",
-    "@supabase/functions-js/edge-runtime.d.ts": "jsr:@supabase/functions-js/edge-runtime.d.ts"
-  }
-}

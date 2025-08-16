@@ -11,8 +11,8 @@ CREATE TABLE proveedor (
   id_externo_db_data VARCHAR(50),
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP,
-  created_by INTEGER,
-  updated_by INTEGER,
+  created_by UUID,  -- Cambio: UUID para Supabase Auth
+  updated_by UUID,  -- Cambio: UUID para Supabase Auth
   estado VARCHAR(20) DEFAULT 'registrado'
 );
 
@@ -26,8 +26,8 @@ CREATE TABLE distribuidor (
   id_externo_db_data VARCHAR(50),
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP,
-  created_by INTEGER,
-  updated_by INTEGER,
+  created_by UUID,  -- Cambio: UUID para Supabase Auth
+  updated_by UUID,  -- Cambio: UUID para Supabase Auth
   estado VARCHAR(20) DEFAULT 'registrado'
 );
 
@@ -43,8 +43,8 @@ CREATE TABLE punto_venta (
   id_externo_db_data VARCHAR(50),
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP,
-  created_by INTEGER,
-  updated_by INTEGER,
+  created_by UUID,  -- Cambio: UUID para Supabase Auth
+  updated_by UUID,  -- Cambio: UUID para Supabase Auth
   estado VARCHAR(20) DEFAULT 'registrado'
 );
 
@@ -59,8 +59,8 @@ CREATE TABLE afiliacion_pv_proveedor (
   usuario_verificador INTEGER,
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP,
-  created_by INTEGER,
-  updated_by INTEGER
+  created_by UUID,  -- Cambio: UUID para Supabase Auth
+  updated_by UUID   -- Cambio: UUID para Supabase Auth
 );
 
 -- 5. zona
@@ -71,8 +71,8 @@ CREATE TABLE zona (
   descripcion TEXT,
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP,
-  created_by INTEGER,
-  updated_by INTEGER,
+  created_by UUID,  -- Cambio: UUID para Supabase Auth
+  updated_by UUID,  -- Cambio: UUID para Supabase Auth
   estado VARCHAR(20) DEFAULT 'registrado'
 );
 
@@ -84,8 +84,8 @@ CREATE TABLE zona_punto_venta (
   fecha_asignacion TIMESTAMP DEFAULT NOW(),
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP,
-  created_by INTEGER,
-  updated_by INTEGER,
+  created_by UUID,  -- Cambio: UUID para Supabase Auth
+  updated_by UUID,  -- Cambio: UUID para Supabase Auth
   estado VARCHAR(20) DEFAULT 'registrado'
 );
 
@@ -103,8 +103,8 @@ CREATE TABLE certificado (
   fecha_venta TIMESTAMP,
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP,
-  created_by INTEGER,
-  updated_by INTEGER
+  created_by UUID,  -- Cambio: UUID para Supabase Auth
+  updated_by UUID   -- Cambio: UUID para Supabase Auth
 );
 
 -- 8. venta
@@ -118,8 +118,8 @@ CREATE TABLE venta (
   estado VARCHAR(20) DEFAULT 'activa',
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP,
-  created_by INTEGER,
-  updated_by INTEGER
+  created_by UUID,  -- Cambio: UUID para Supabase Auth
+  updated_by UUID   -- Cambio: UUID para Supabase Auth
 );
 
 -- 9. venta_certificado
@@ -134,8 +134,8 @@ CREATE TABLE venta_certificado (
   estado VARCHAR(20) DEFAULT 'vendido',
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP,
-  created_by INTEGER,
-  updated_by INTEGER
+  created_by UUID,  -- Cambio: UUID para Supabase Auth
+  updated_by UUID   -- Cambio: UUID para Supabase Auth
 );
 
 -- 10. descuento_pv
@@ -149,8 +149,8 @@ CREATE TABLE descuento_pv (
   fecha_fin DATE,
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP,
-  created_by INTEGER,
-  updated_by INTEGER,
+  created_by UUID,  -- Cambio: UUID para Supabase Auth
+  updated_by UUID,  -- Cambio: UUID para Supabase Auth
   estado VARCHAR(20) DEFAULT 'activo'
 );
 
@@ -167,8 +167,8 @@ CREATE TABLE deuda (
   mora_acumulada DECIMAL(12,2),
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP,
-  created_by INTEGER,
-  updated_by INTEGER
+  created_by UUID,  -- Cambio: UUID para Supabase Auth
+  updated_by UUID   -- Cambio: UUID para Supabase Auth
 );
 
 -- 12. credito
@@ -180,8 +180,8 @@ CREATE TABLE credito (
   stock_actual INTEGER,
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP,
-  created_by INTEGER,
-  updated_by INTEGER,
+  created_by UUID,  -- Cambio: UUID para Supabase Auth
+  updated_by UUID,  -- Cambio: UUID para Supabase Auth
   estado VARCHAR(20) DEFAULT 'activo'
 );
 
@@ -196,8 +196,8 @@ CREATE TABLE pago (
   observaciones TEXT,
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP,
-  created_by INTEGER,
-  updated_by INTEGER
+  created_by UUID,  -- Cambio: UUID para Supabase Auth
+  updated_by UUID   -- Cambio: UUID para Supabase Auth
 );
 
 -- 14. pago_deuda
@@ -208,8 +208,8 @@ CREATE TABLE pago_deuda (
   monto_aplicado DECIMAL(12,2),
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP,
-  created_by INTEGER,
-  updated_by INTEGER
+  created_by UUID,  -- Cambio: UUID para Supabase Auth
+  updated_by UUID   -- Cambio: UUID para Supabase Auth
 );
 
 -- 15. politica_mora
@@ -221,8 +221,8 @@ CREATE TABLE politica_mora (
   dias_gracia INTEGER,
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP,
-  created_by INTEGER,
-  updated_by INTEGER,
+  created_by UUID,  -- Cambio: UUID para Supabase Auth
+  updated_by UUID,  -- Cambio: UUID para Supabase Auth
   estado VARCHAR(20) DEFAULT 'activo'
 );
 
@@ -238,8 +238,8 @@ CREATE TABLE visita (
   observaciones TEXT,
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP,
-  created_by INTEGER,
-  updated_by INTEGER
+  created_by UUID,  -- Cambio: UUID para Supabase Auth
+  updated_by UUID   -- Cambio: UUID para Supabase Auth
 );
 
 -- 17. usuario
@@ -254,8 +254,8 @@ CREATE TABLE usuario (
   estado VARCHAR(20) DEFAULT 'registrado',
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP,
-  created_by INTEGER,
-  updated_by INTEGER
+  created_by UUID,  -- Cambio: UUID para Supabase Auth
+  updated_by UUID   -- Cambio: UUID para Supabase Auth
 );
 
 -- 18. usuario_rol
@@ -267,6 +267,6 @@ CREATE TABLE usuario_rol (
   fecha_asignacion TIMESTAMP DEFAULT NOW(),
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP,
-  created_by INTEGER,
-  updated_by INTEGER
+  created_by UUID,  -- Cambio: UUID para Supabase Auth
+  updated_by UUID   -- Cambio: UUID para Supabase Auth
 );

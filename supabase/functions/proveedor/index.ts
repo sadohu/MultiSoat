@@ -1,4 +1,4 @@
-// Edge Function: Proveedor - CRUD completo para proveedores
+// Edge Function: Proveedor - CRUD completo para proveedores con auditoría
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import {
   http200,
@@ -10,8 +10,15 @@ import {
 } from "shared/utils/http.ts";
 import { getSupabaseClient } from "shared/utils/client-auth.ts";
 import { Validator } from "shared/utils/Validator.ts";
+import {
+  enrichWithAuditInfo,
+  withAudit,
+  withOptionalAuth,
+} from "shared/utils/audit.ts";
 
-console.log("Edge Function: Proveedor - CRUD Proveedores");
+console.log(
+  "Edge Function: Proveedor - CRUD Proveedores con Auditoría Completa",
+);
 
 interface ProveedorData {
   nombre?: string;
@@ -24,370 +31,481 @@ interface ProveedorData {
   estado?: string;
 }
 
-// Validar datos de proveedor
-function validateProveedorData(
-  data: Partial<ProveedorData>,
-  isUpdate = false,
-): { valid: boolean; errors: string[] } {
-  const errors: string[] = [];
+// Constantes
+const VALID_ESTADOS = ["registrado", "inactivo"] as const;
+const VALID_TIPO_DOCUMENTOS = ["RUC", "DNI", "CE"] as const;
+const DEFAULT_PAGE_LIMIT = 10;
+const MAX_PAGE_LIMIT = 100;
 
-  if (!isUpdate) {
-    // Validaciones requeridas para CREATE
-    if (!data.tipo_documento) errors.push("tipo_documento es requerido");
-    if (!data.numero_documento) errors.push("numero_documento es requerido");
-  }
-
-  // Validaciones de formato
-  if (
-    data.tipo_documento && !["RUC", "DNI", "CE"].includes(data.tipo_documento)
-  ) {
-    errors.push("tipo_documento debe ser: RUC, DNI o CE");
-  }
-
-  if (data.numero_documento) {
-    if (
-      data.tipo_documento === "RUC" &&
-      !Validator.isValidRUC(data.numero_documento)
-    ) {
-      errors.push("RUC inválido (debe tener 11 dígitos)");
-    }
-    if (
-      data.tipo_documento === "DNI" &&
-      !Validator.isValidDNI(data.numero_documento)
-    ) {
-      errors.push("DNI inválido (debe tener 8 dígitos)");
-    }
-  }
-
-  if (data.email && !Validator.isValidEmail(data.email)) {
-    errors.push("Email tiene formato inválido");
-  }
-
-  if (data.telefono && !Validator.isValidPhone(data.telefono)) {
-    errors.push("Teléfono inválido (debe tener 9 dígitos y empezar por 9)");
-  }
-
-  return { valid: errors.length === 0, errors };
+// Funciones auxiliares
+function parseProveedorId(pathSegments: string[]): number | null {
+  const id = pathSegments[pathSegments.length - 1];
+  return id && !isNaN(Number(id)) ? Number(id) : null;
 }
 
-Deno.serve(withCors(async (req: Request) => {
+function validatePaginationParams(
+  page: string,
+  limit: string,
+): { valid: boolean; error?: string; page?: number; limit?: number } {
+  const parsedPage = parseInt(page || "1");
+  const parsedLimit = parseInt(limit || DEFAULT_PAGE_LIMIT.toString());
+
+  if (isNaN(parsedPage) || parsedPage < 1) {
+    return {
+      valid: false,
+      error: "El parámetro 'page' debe ser un número entero mayor a 0",
+    };
+  }
+  if (isNaN(parsedLimit) || parsedLimit < 1 || parsedLimit > MAX_PAGE_LIMIT) {
+    return {
+      valid: false,
+      error:
+        `El parámetro 'limit' debe ser un número entero entre 1 y ${MAX_PAGE_LIMIT}`,
+    };
+  }
+
+  return { valid: true, page: parsedPage, limit: parsedLimit };
+}
+
+function validateFilterParams(
+  estado: string,
+  tipo_documento: string,
+): { valid: boolean; error?: string } {
+  if (
+    estado && !VALID_ESTADOS.includes(estado as typeof VALID_ESTADOS[number])
+  ) {
+    return {
+      valid: false,
+      error: `El parámetro 'estado' debe ser uno de: ${
+        VALID_ESTADOS.join(", ")
+      }`,
+    };
+  }
+  if (
+    tipo_documento &&
+    !VALID_TIPO_DOCUMENTOS.includes(
+      tipo_documento as typeof VALID_TIPO_DOCUMENTOS[number],
+    )
+  ) {
+    return {
+      valid: false,
+      error: `El parámetro 'tipo_documento' debe ser uno de: ${
+        VALID_TIPO_DOCUMENTOS.join(", ")
+      }`,
+    };
+  }
+  return { valid: true };
+}
+
+function sanitizeSearchTerm(search: string): string {
+  return search.replace(/[%_'"\\]/g, "");
+}
+
+// deno-lint-ignore no-explicit-any
+function applyFilters(
+  query: any,
+  search: string,
+  estado: string,
+  tipo_documento: string,
+) {
+  if (search) {
+    const sanitizedSearch = sanitizeSearchTerm(search);
+    if (sanitizedSearch.length > 0) {
+      query = query.or(
+        `nombre.ilike.%${sanitizedSearch}%,razon_social.ilike.%${sanitizedSearch}%,numero_documento.ilike.%${sanitizedSearch}%`,
+      );
+    }
+  }
+  if (estado) {
+    query = query.eq("estado", estado);
+  }
+  if (tipo_documento) {
+    query = query.eq("tipo_documento", tipo_documento);
+  }
+  return query;
+}
+
+// deno-lint-ignore no-explicit-any
+function handleDatabaseError(error: any): Response {
+  let errorMessage = "Error desconocido en consulta";
+  let errorCode = "unknown";
+
+  try {
+    if (error.code) {
+      errorCode = error.code;
+    }
+
+    if (error.message && error.message.startsWith('{"')) {
+      errorMessage = "Error de consulta en base de datos";
+    } else if (error.message) {
+      errorMessage = error.message;
+    }
+
+    if (
+      error.details && typeof error.details === "string" &&
+      !error.details.startsWith('{"')
+    ) {
+      errorMessage = error.details;
+    }
+  } catch (_parseError) {
+    errorMessage = "Error al procesar respuesta de base de datos";
+  }
+
+  return http500(
+    "Error al obtener proveedores",
+    `${errorCode !== "unknown" ? `Code ${errorCode}: ` : ""}${errorMessage}`,
+  );
+}
+
+// deno-lint-ignore no-explicit-any
+async function checkDuplicateDocument(
+  supabase: any,
+  numero_documento: string,
+  excludeId?: number,
+): Promise<boolean> {
+  let query = supabase
+    .from("proveedor")
+    .select("id")
+    .eq("numero_documento", numero_documento);
+
+  if (excludeId) {
+    query = query.neq("id", excludeId);
+  }
+
+  const { data } = await query.single();
+  return !!data;
+}
+
+Deno.serve(withCors((req: Request) => {
   const supabase = getSupabaseClient(req);
   const url = new URL(req.url);
   const method = req.method;
   const pathSegments = url.pathname.split("/").filter(Boolean);
-  const proveedorId = pathSegments[pathSegments.length - 1];
+  const proveedorId = parseProveedorId(pathSegments);
 
   try {
     switch (method) {
       case "GET": {
-        if (proveedorId && !isNaN(Number(proveedorId))) {
-          // GET /proveedor/{id} - Obtener proveedor específico
-          const { data: proveedor, error } = await supabase
-            .from("proveedor")
-            .select("*")
-            .eq("id", Number(proveedorId))
-            .single();
-
-          if (error || !proveedor) {
-            return http404("Proveedor no encontrado");
-          }
-
-          return http200({
-            proveedor,
-            message: "Proveedor encontrado",
-          });
-        } else {
-          // GET /proveedor - Listar todos los proveedores con filtros opcionales
-          const page = parseInt(url.searchParams.get("page") || "1");
-          const limit = parseInt(url.searchParams.get("limit") || "10");
-          const search = url.searchParams.get("search") || "";
-          const estado = url.searchParams.get("estado") || "";
-          const tipo_documento = url.searchParams.get("tipo_documento") || "";
-
-          // Validar parámetros de paginación
-          if (isNaN(page) || page < 1) {
-            return http400(
-              "El parámetro 'page' debe ser un número entero mayor a 0",
-            );
-          }
-          if (isNaN(limit) || limit < 1 || limit > 100) {
-            return http400(
-              "El parámetro 'limit' debe ser un número entero entre 1 y 100",
-            );
-          }
-
-          try {
-            // Primera query: Solo obtener el count
-            let countQuery = supabase
+        // GET /proveedor - Operaciones de lectura (AUTENTICACIÓN OPCIONAL)
+        return withOptionalAuth(async (_req, user) => {
+          if (proveedorId) {
+            // GET /proveedor/{id} - Obtener proveedor específico
+            const { data: proveedor, error } = await supabase
               .from("proveedor")
-              .select("*", { count: "exact", head: true });
+              .select("*")
+              .eq("id", proveedorId)
+              .single();
 
-            // Aplicar filtros al count
-            if (search) {
-              const sanitizedSearch = search.replace(/[%_'"\\]/g, "");
-              if (sanitizedSearch.length > 0) {
-                countQuery = countQuery.or(
-                  `nombre.ilike.%${sanitizedSearch}%,razon_social.ilike.%${sanitizedSearch}%,numero_documento.ilike.%${sanitizedSearch}%`,
-                );
-              }
-            }
-            if (estado) {
-              if (!["activo", "inactivo"].includes(estado)) {
-                return http400(
-                  "El parámetro 'estado' debe ser 'activo' o 'inactivo'",
-                );
-              }
-              countQuery = countQuery.eq("estado", estado);
-            }
-            if (tipo_documento) {
-              if (!["RUC", "DNI", "CE"].includes(tipo_documento)) {
-                return http400(
-                  "El parámetro 'tipo_documento' debe ser 'RUC', 'DNI' o 'CE'",
-                );
-              }
-              countQuery = countQuery.eq("tipo_documento", tipo_documento);
+            if (error || !proveedor) {
+              return http404("Proveedor no encontrado");
             }
 
-            const { count, error: countError } = await countQuery;
-
-            if (countError) {
-              return http500(
-                "Error al consultar total de registros",
-                countError.message,
-              );
+            // Enriquecer respuesta si el usuario está autenticado
+            if (user) {
+              return http200({
+                proveedor,
+                message: "Proveedor encontrado",
+                userInfo: {
+                  viewedBy: user.email,
+                  canEdit: user.rol === "admin" || user.rol === "supervisor",
+                  timestamp: new Date().toISOString(),
+                },
+              });
             }
 
-            const total = count || 0;
-            const totalPages = Math.ceil(total / limit);
-
-            // Verificar si la página solicitada existe
-            if (page > totalPages && total > 0) {
-              return http400(
-                `La página ${page} no existe. Solo hay ${totalPages} página(s) disponible(s) con ${total} registro(s) total(es).`,
-              );
-            }
-
-            // Segunda query: Obtener los datos con paginación
-            let dataQuery = supabase
-              .from("proveedor")
-              .select("*");
-
-            // Aplicar los mismos filtros
-            if (search) {
-              const sanitizedSearch = search.replace(/[%_'"\\]/g, "");
-              if (sanitizedSearch.length > 0) {
-                dataQuery = dataQuery.or(
-                  `nombre.ilike.%${sanitizedSearch}%,razon_social.ilike.%${sanitizedSearch}%,numero_documento.ilike.%${sanitizedSearch}%`,
-                );
-              }
-            }
-            if (estado) {
-              dataQuery = dataQuery.eq("estado", estado);
-            }
-            if (tipo_documento) {
-              dataQuery = dataQuery.eq("tipo_documento", tipo_documento);
-            }
-
-            const offset = (page - 1) * limit;
-            dataQuery = dataQuery.range(offset, offset + limit - 1);
-
-            const { data: proveedores, error } = await dataQuery;
-
-            if (error) {
-              let errorMessage = "Error desconocido en consulta";
-              let errorCode = "unknown";
-
-              try {
-                if (error.code) {
-                  errorCode = error.code;
-                }
-
-                if (error.message && error.message.startsWith('{"')) {
-                  errorMessage = "Error de consulta en base de datos";
-                } else if (error.message) {
-                  errorMessage = error.message;
-                }
-
-                if (
-                  error.details && typeof error.details === "string" &&
-                  !error.details.startsWith('{"')
-                ) {
-                  errorMessage = error.details;
-                }
-              } catch (_parseError) {
-                errorMessage = "Error al procesar respuesta de base de datos";
-              }
-
-              return http500(
-                "Error al obtener proveedores",
-                `${
-                  errorCode !== "unknown" ? `Code ${errorCode}: ` : ""
-                }${errorMessage}`,
-              );
-            }
-
+            // Respuesta básica para usuarios no autenticados
             return http200({
-              proveedores: proveedores || [],
-              pagination: {
-                page,
-                limit,
-                total,
-                totalPages,
-                hasNextPage: page < totalPages,
-                hasPrevPage: page > 1,
-              },
-              filters: { search, estado, tipo_documento },
-              message: total === 0
-                ? "No se encontraron proveedores con los filtros aplicados"
-                : `Se encontraron ${total} proveedor(es). Mostrando página ${page} de ${totalPages}.`,
+              proveedor,
+              message: "Proveedor encontrado",
             });
-          } catch (generalError) {
-            return http500(
-              "Error general",
-              `${(generalError as Error).message || "Error desconocido"}`,
+          } else {
+            // GET /proveedor - Listar todos los proveedores con filtros opcionales
+            const searchParams = url.searchParams;
+            const search = searchParams.get("search") || "";
+            const estado = searchParams.get("estado") || "";
+            const tipo_documento = searchParams.get("tipo_documento") || "";
+
+            // Validar parámetros de paginación
+            const paginationValidation = validatePaginationParams(
+              searchParams.get("page") || "",
+              searchParams.get("limit") || "",
             );
-          }
-        }
+            if (!paginationValidation.valid) {
+              return http400(paginationValidation.error!);
+            }
+            const { page, limit } = paginationValidation;
+
+            // TypeScript assertion - ya validamos que existen
+            const validPage = page!;
+            const validLimit = limit!;
+
+            // Validar parámetros de filtro
+            const filterValidation = validateFilterParams(
+              estado,
+              tipo_documento,
+            );
+            if (!filterValidation.valid) {
+              return http400(filterValidation.error!);
+            }
+
+            try {
+              // Primera query: Solo obtener el count
+              let countQuery = supabase
+                .from("proveedor")
+                .select("*", { count: "exact", head: true });
+
+              // Aplicar filtros al count
+              countQuery = applyFilters(
+                countQuery,
+                search,
+                estado,
+                tipo_documento,
+              );
+
+              const { count, error: countError } = await countQuery;
+
+              if (countError) {
+                return http500(
+                  "Error al consultar total de registros",
+                  countError.message,
+                );
+              }
+
+              const total = count || 0;
+              const totalPages = Math.ceil(total / validLimit);
+
+              // Verificar si la página solicitada existe
+              if (validPage > totalPages && total > 0) {
+                return http400(
+                  `La página ${validPage} no existe. Solo hay ${totalPages} página(s) disponible(s) con ${total} registro(s) total(es).`,
+                );
+              }
+
+              // Segunda query: Obtener los datos con paginación
+              let dataQuery = supabase
+                .from("proveedor")
+                .select("*");
+
+              // Aplicar los mismos filtros
+              dataQuery = applyFilters(
+                dataQuery,
+                search,
+                estado,
+                tipo_documento,
+              );
+
+              const offset = (validPage - 1) * validLimit;
+              dataQuery = dataQuery.range(offset, offset + validLimit - 1);
+
+              const { data: proveedores, error } = await dataQuery;
+
+              if (error) {
+                return handleDatabaseError(error);
+              }
+
+              // Enriquecer respuesta según estado de autenticación
+              const responseData = {
+                data: proveedores || [],
+                pagination: {
+                  page: validPage,
+                  limit: validLimit,
+                  total,
+                  totalPages,
+                  hasNextPage: validPage < totalPages,
+                  hasPrevPage: validPage > 1,
+                },
+                filters: { search, estado, tipo_documento },
+                message: total === 0
+                  ? "No se encontraron proveedores con los filtros aplicados"
+                  : `Se encontraron ${total} proveedor(es). Mostrando página ${validPage} de ${totalPages}.`,
+              };
+
+              // Si hay usuario autenticado, agregar información adicional
+              if (user) {
+                return http200({
+                  ...responseData,
+                  userInfo: {
+                    viewedBy: user.email,
+                    canCreate: user.rol === "admin" ||
+                      user.rol === "supervisor",
+                    canEdit: user.rol === "admin" || user.rol === "supervisor",
+                    viewTimestamp: new Date().toISOString(),
+                  },
+                });
+              }
+
+              return http200(responseData);
+            } catch (generalError) {
+              return http500(
+                "Error general",
+                `${(generalError as Error).message || "Error desconocido"}`,
+              );
+            }
+          } // Cerrar else
+        })(req); // Cerrar withOptionalAuth
       }
 
       case "POST": {
-        // POST /proveedor - Crear nuevo proveedor
-        const proveedorData: ProveedorData = await req.json();
+        // POST /proveedor - Crear nuevo proveedor (CON AUDITORÍA OBLIGATORIA)
+        return withAudit(async (_req, auditInfo) => {
+          const proveedorData: ProveedorData = await req.json();
 
-        const validation = validateProveedorData(proveedorData);
-        if (!validation.valid) {
-          return http400("Datos de proveedor inválidos", {
-            errors: validation.errors,
-          });
-        }
+          const validation = Validator.validateProveedorData(proveedorData);
+          if (!validation.valid) {
+            return http400("Datos de proveedor inválidos", {
+              errors: validation.errors,
+            });
+          }
 
-        // Verificar si ya existe proveedor con el mismo documento
-        const { data: existing } = await supabase
-          .from("proveedor")
-          .select("id")
-          .eq("numero_documento", proveedorData.numero_documento)
-          .single();
+          // Verificar si ya existe proveedor con el mismo documento
+          const duplicateExists = await checkDuplicateDocument(
+            supabase,
+            proveedorData.numero_documento,
+          );
+          if (duplicateExists) {
+            return http400(
+              "Ya existe un proveedor con este número de documento",
+            );
+          }
 
-        if (existing) {
-          return http400("Ya existe un proveedor con este número de documento");
-        }
+          // Insertar con campos de auditoría automáticos
+          const { data: newProveedor, error: createError } = await supabase
+            .from("proveedor")
+            .insert({
+              nombre: proveedorData.nombre,
+              razon_social: proveedorData.razon_social,
+              tipo_documento: proveedorData.tipo_documento,
+              numero_documento: proveedorData.numero_documento,
+              email: proveedorData.email,
+              telefono: proveedorData.telefono,
+              direccion: proveedorData.direccion,
+              estado: proveedorData.estado || "registrado",
+              ...auditInfo.fields, // Campos de auditoría: created_by, updated_by, created_at, updated_at
+            })
+            .select()
+            .single();
 
-        const { data: newProveedor, error: createError } = await supabase
-          .from("proveedor")
-          .insert({
-            nombre: proveedorData.nombre,
-            razon_social: proveedorData.razon_social,
-            tipo_documento: proveedorData.tipo_documento,
-            numero_documento: proveedorData.numero_documento,
-            email: proveedorData.email,
-            telefono: proveedorData.telefono,
-            direccion: proveedorData.direccion,
-            estado: proveedorData.estado || "activo",
-            created_at: new Date().toISOString(),
-          })
-          .select()
-          .single();
+          if (createError) {
+            return http500("Error al crear proveedor", createError.message);
+          }
 
-        if (createError) {
-          return http500("Error al crear proveedor", createError.message);
-        }
-
-        return http201(newProveedor, "Proveedor creado exitosamente");
+          // Respuesta enriquecida con información de auditoría
+          return http201(
+            enrichWithAuditInfo(newProveedor, auditInfo, "created"),
+            "Proveedor creado exitosamente",
+          );
+        })(req);
       }
 
       case "PUT": {
-        // PUT /proveedor/{id} - Actualizar proveedor completo
+        // PUT /proveedor/{id} - Actualizar proveedor (CON AUDITORÍA OBLIGATORIA)
         if (!proveedorId || isNaN(Number(proveedorId))) {
           return http400("ID de proveedor requerido");
         }
 
-        const updateData: Partial<ProveedorData> = await req.json();
+        return withAudit(async (_req, auditInfo) => {
+          const updateData: Partial<ProveedorData> = await req.json();
 
-        const updateValidation = validateProveedorData(updateData, true);
-        if (!updateValidation.valid) {
-          return http400("Datos de proveedor inválidos", {
-            errors: updateValidation.errors,
-          });
-        }
+          const updateValidation = Validator.validateProveedorData(
+            updateData,
+            true,
+          );
+          if (!updateValidation.valid) {
+            return http400("Datos de proveedor inválidos", {
+              errors: updateValidation.errors,
+            });
+          }
 
-        // Verificar que el proveedor existe
-        const { data: existingProveedor } = await supabase
-          .from("proveedor")
-          .select("id")
-          .eq("id", Number(proveedorId))
-          .single();
-
-        if (!existingProveedor) {
-          return http404("Proveedor no encontrado");
-        }
-
-        // Si se actualiza el documento, verificar que no exista otro con el mismo
-        if (updateData.numero_documento) {
-          const { data: docExists } = await supabase
+          // Verificar que el proveedor existe
+          const { data: existingProveedor } = await supabase
             .from("proveedor")
             .select("id")
-            .eq("numero_documento", updateData.numero_documento)
-            .neq("id", Number(proveedorId))
+            .eq("id", proveedorId!)
             .single();
 
-          if (docExists) {
-            return http400(
-              "Ya existe otro proveedor con este número de documento",
+          if (!existingProveedor) {
+            return http404("Proveedor no encontrado");
+          }
+
+          // Si se actualiza el documento, verificar que no exista otro con el mismo
+          if (updateData.numero_documento) {
+            const duplicateExists = await checkDuplicateDocument(
+              supabase,
+              updateData.numero_documento,
+              proveedorId!,
+            );
+            if (duplicateExists) {
+              return http400(
+                "Ya existe otro proveedor con este número de documento",
+              );
+            }
+          }
+
+          // Actualizar con campos de auditoría
+          const { data: updatedProveedor, error: updateError } = await supabase
+            .from("proveedor")
+            .update({
+              ...updateData,
+              ...auditInfo.fields, // Campos de auditoría: updated_by, updated_at
+            })
+            .eq("id", proveedorId!)
+            .select()
+            .single();
+
+          if (updateError) {
+            return http500(
+              "Error al actualizar proveedor",
+              updateError.message,
             );
           }
-        }
 
-        const { data: updatedProveedor, error: updateError } = await supabase
-          .from("proveedor")
-          .update({
-            ...updateData,
-            updated_at: new Date().toISOString(),
-          })
-          .eq("id", Number(proveedorId))
-          .select()
-          .single();
-
-        if (updateError) {
-          return http500("Error al actualizar proveedor", updateError.message);
-        }
-
-        return http200(updatedProveedor, "Proveedor actualizado exitosamente");
+          // Respuesta enriquecida con información de auditoría
+          return http200(
+            enrichWithAuditInfo(updatedProveedor, auditInfo, "updated"),
+            "Proveedor actualizado exitosamente",
+          );
+        })(req);
       }
 
       case "DELETE": {
-        // DELETE /proveedor/{id} - Eliminar proveedor (soft delete)
-        if (!proveedorId || isNaN(Number(proveedorId))) {
+        // DELETE /proveedor/{id} - Eliminar proveedor (CON AUDITORÍA OBLIGATORIA)
+        if (!proveedorId) {
           return http400("ID de proveedor requerido");
         }
 
-        // Verificar que el proveedor existe
-        const { data: proveedorToDelete } = await supabase
-          .from("proveedor")
-          .select("id, estado")
-          .eq("id", Number(proveedorId))
-          .single();
+        return withAudit(async (_req, auditInfo) => {
+          // Verificar que el proveedor existe
+          const { data: proveedorToDelete } = await supabase
+            .from("proveedor")
+            .select("id, estado")
+            .eq("id", proveedorId!)
+            .single();
 
-        if (!proveedorToDelete) {
-          return http404("Proveedor no encontrado");
-        }
+          if (!proveedorToDelete) {
+            return http404("Proveedor no encontrado");
+          }
 
-        // Soft delete: cambiar estado a "inactivo"
-        const { error: deleteError } = await supabase
-          .from("proveedor")
-          .update({
-            estado: "inactivo",
-            updated_at: new Date().toISOString(),
-          })
-          .eq("id", Number(proveedorId));
+          // Soft delete: cambiar estado a "inactivo" con auditoría
+          const { data: deletedProveedor, error: deleteError } = await supabase
+            .from("proveedor")
+            .update({
+              estado: "inactivo",
+              ...auditInfo.fields, // Campos de auditoría: updated_by, updated_at
+            })
+            .eq("id", proveedorId!)
+            .select()
+            .single();
 
-        if (deleteError) {
-          return http500("Error al eliminar proveedor", deleteError.message);
-        }
+          if (deleteError) {
+            return http500("Error al eliminar proveedor", deleteError.message);
+          }
 
-        return http200(
-          { id: Number(proveedorId), estado: "inactivo" },
-          "Proveedor eliminado exitosamente",
-        );
+          // Respuesta enriquecida con información de auditoría
+          return http200(
+            enrichWithAuditInfo(deletedProveedor, auditInfo, "updated"),
+            "Proveedor eliminado exitosamente",
+          );
+        })(req);
       }
 
       default: {

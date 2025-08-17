@@ -98,4 +98,62 @@ export class Validator {
             );
         }
     }
+
+    // Validación específica para datos de proveedor
+    static validateProveedorData(
+        data: any,
+        isUpdate = false,
+    ): { valid: boolean; errors: string[] } {
+        const errors: string[] = [];
+
+        if (!isUpdate) {
+            // Validaciones requeridas para CREATE
+            if (!data.razon_social?.trim()) {
+                errors.push("Razón social es requerida");
+            }
+            if (!data.tipo_documento?.trim()) {
+                errors.push("Tipo de documento es requerido");
+            }
+            if (!data.numero_documento?.trim()) {
+                errors.push("Número de documento es requerido");
+            }
+        }
+
+        // Validaciones de formato (aplicables tanto para CREATE como UPDATE)
+        if (
+            data.tipo_documento &&
+            !["RUC", "DNI", "CE"].includes(data.tipo_documento)
+        ) {
+            errors.push("tipo_documento debe ser: RUC, DNI o CE");
+        }
+
+        if (data.numero_documento) {
+            // Validar según el tipo de documento
+            if (
+                data.tipo_documento === "RUC" &&
+                !this.isValidRUC(data.numero_documento)
+            ) {
+                errors.push("RUC inválido (debe tener 11 dígitos)");
+            }
+            if (
+                data.tipo_documento === "DNI" &&
+                !this.isValidDNI(data.numero_documento)
+            ) {
+                errors.push("DNI inválido (debe tener 8 dígitos)");
+            }
+        }
+
+        // Validaciones opcionales
+        if (data.email && !this.isValidEmail(data.email)) {
+            errors.push("Email tiene formato inválido");
+        }
+
+        if (data.telefono && !this.isValidPhone(data.telefono)) {
+            errors.push(
+                "Teléfono inválido (debe tener 9 dígitos y empezar por 9)",
+            );
+        }
+
+        return { valid: errors.length === 0, errors };
+    }
 }

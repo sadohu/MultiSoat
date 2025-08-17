@@ -7,7 +7,7 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "13.0.4"
@@ -22,10 +22,10 @@ export type Database = {
     Functions: {
       graphql: {
         Args: {
+          extensions?: Json
           operationName?: string
           query?: string
           variables?: Json
-          extensions?: Json
         }
         Returns: Json
       }
@@ -42,7 +42,7 @@ export type Database = {
       afiliacion_pv_proveedor: {
         Row: {
           created_at: string | null
-          created_by: number | null
+          created_by: string | null
           estado: string | null
           fecha_verificacion: string | null
           id: number
@@ -50,12 +50,12 @@ export type Database = {
           id_proveedor: number | null
           id_punto_venta: number | null
           updated_at: string | null
-          updated_by: number | null
+          updated_by: string | null
           usuario_verificador: number | null
         }
         Insert: {
           created_at?: string | null
-          created_by?: number | null
+          created_by?: string | null
           estado?: string | null
           fecha_verificacion?: string | null
           id?: number
@@ -63,12 +63,12 @@ export type Database = {
           id_proveedor?: number | null
           id_punto_venta?: number | null
           updated_at?: string | null
-          updated_by?: number | null
+          updated_by?: string | null
           usuario_verificador?: number | null
         }
         Update: {
           created_at?: string | null
-          created_by?: number | null
+          created_by?: string | null
           estado?: string | null
           fecha_verificacion?: string | null
           id?: number
@@ -76,7 +76,7 @@ export type Database = {
           id_proveedor?: number | null
           id_punto_venta?: number | null
           updated_at?: string | null
-          updated_by?: number | null
+          updated_by?: string | null
           usuario_verificador?: number | null
         }
         Relationships: [
@@ -107,7 +107,7 @@ export type Database = {
         Row: {
           categoria: string | null
           created_at: string | null
-          created_by: number | null
+          created_by: string | null
           datos_vehiculo_externo: string | null
           estado: string | null
           fecha_asignacion: string | null
@@ -118,12 +118,12 @@ export type Database = {
           id_proveedor: number | null
           numero_serie: string
           updated_at: string | null
-          updated_by: number | null
+          updated_by: string | null
         }
         Insert: {
           categoria?: string | null
           created_at?: string | null
-          created_by?: number | null
+          created_by?: string | null
           datos_vehiculo_externo?: string | null
           estado?: string | null
           fecha_asignacion?: string | null
@@ -134,12 +134,12 @@ export type Database = {
           id_proveedor?: number | null
           numero_serie: string
           updated_at?: string | null
-          updated_by?: number | null
+          updated_by?: string | null
         }
         Update: {
           categoria?: string | null
           created_at?: string | null
-          created_by?: number | null
+          created_by?: string | null
           datos_vehiculo_externo?: string | null
           estado?: string | null
           fecha_asignacion?: string | null
@@ -150,7 +150,7 @@ export type Database = {
           id_proveedor?: number | null
           numero_serie?: string
           updated_at?: string | null
-          updated_by?: number | null
+          updated_by?: string | null
         }
         Relationships: [
           {
@@ -165,7 +165,7 @@ export type Database = {
       credito: {
         Row: {
           created_at: string | null
-          created_by: number | null
+          created_by: string | null
           estado: string | null
           id: number
           id_proveedor: number | null
@@ -173,11 +173,11 @@ export type Database = {
           limite_credito: number | null
           stock_actual: number | null
           updated_at: string | null
-          updated_by: number | null
+          updated_by: string | null
         }
         Insert: {
           created_at?: string | null
-          created_by?: number | null
+          created_by?: string | null
           estado?: string | null
           id?: number
           id_proveedor?: number | null
@@ -185,11 +185,11 @@ export type Database = {
           limite_credito?: number | null
           stock_actual?: number | null
           updated_at?: string | null
-          updated_by?: number | null
+          updated_by?: string | null
         }
         Update: {
           created_at?: string | null
-          created_by?: number | null
+          created_by?: string | null
           estado?: string | null
           id?: number
           id_proveedor?: number | null
@@ -197,7 +197,7 @@ export type Database = {
           limite_credito?: number | null
           stock_actual?: number | null
           updated_at?: string | null
-          updated_by?: number | null
+          updated_by?: string | null
         }
         Relationships: [
           {
@@ -219,7 +219,7 @@ export type Database = {
       descuento_pv: {
         Row: {
           created_at: string | null
-          created_by: number | null
+          created_by: string | null
           estado: string | null
           fecha_fin: string | null
           fecha_inicio: string | null
@@ -229,11 +229,11 @@ export type Database = {
           monto_fijo: number | null
           porcentaje: number | null
           updated_at: string | null
-          updated_by: number | null
+          updated_by: string | null
         }
         Insert: {
           created_at?: string | null
-          created_by?: number | null
+          created_by?: string | null
           estado?: string | null
           fecha_fin?: string | null
           fecha_inicio?: string | null
@@ -243,11 +243,11 @@ export type Database = {
           monto_fijo?: number | null
           porcentaje?: number | null
           updated_at?: string | null
-          updated_by?: number | null
+          updated_by?: string | null
         }
         Update: {
           created_at?: string | null
-          created_by?: number | null
+          created_by?: string | null
           estado?: string | null
           fecha_fin?: string | null
           fecha_inicio?: string | null
@@ -257,7 +257,7 @@ export type Database = {
           monto_fijo?: number | null
           porcentaje?: number | null
           updated_at?: string | null
-          updated_by?: number | null
+          updated_by?: string | null
         }
         Relationships: [
           {
@@ -279,7 +279,7 @@ export type Database = {
       deuda: {
         Row: {
           created_at: string | null
-          created_by: number | null
+          created_by: string | null
           estado: string | null
           fecha_vencimiento: string | null
           id: number
@@ -290,11 +290,11 @@ export type Database = {
           monto_pendiente: number | null
           mora_acumulada: number | null
           updated_at: string | null
-          updated_by: number | null
+          updated_by: string | null
         }
         Insert: {
           created_at?: string | null
-          created_by?: number | null
+          created_by?: string | null
           estado?: string | null
           fecha_vencimiento?: string | null
           id?: number
@@ -305,11 +305,11 @@ export type Database = {
           monto_pendiente?: number | null
           mora_acumulada?: number | null
           updated_at?: string | null
-          updated_by?: number | null
+          updated_by?: string | null
         }
         Update: {
           created_at?: string | null
-          created_by?: number | null
+          created_by?: string | null
           estado?: string | null
           fecha_vencimiento?: string | null
           id?: number
@@ -320,7 +320,7 @@ export type Database = {
           monto_pendiente?: number | null
           mora_acumulada?: number | null
           updated_at?: string | null
-          updated_by?: number | null
+          updated_by?: string | null
         }
         Relationships: [
           {
@@ -349,7 +349,7 @@ export type Database = {
       distribuidor: {
         Row: {
           created_at: string | null
-          created_by: number | null
+          created_by: string | null
           email: string | null
           estado: string | null
           id: number
@@ -358,11 +358,11 @@ export type Database = {
           nombre: string | null
           telefono: string | null
           updated_at: string | null
-          updated_by: number | null
+          updated_by: string | null
         }
         Insert: {
           created_at?: string | null
-          created_by?: number | null
+          created_by?: string | null
           email?: string | null
           estado?: string | null
           id?: number
@@ -371,11 +371,11 @@ export type Database = {
           nombre?: string | null
           telefono?: string | null
           updated_at?: string | null
-          updated_by?: number | null
+          updated_by?: string | null
         }
         Update: {
           created_at?: string | null
-          created_by?: number | null
+          created_by?: string | null
           email?: string | null
           estado?: string | null
           id?: number
@@ -384,7 +384,7 @@ export type Database = {
           nombre?: string | null
           telefono?: string | null
           updated_at?: string | null
-          updated_by?: number | null
+          updated_by?: string | null
         }
         Relationships: [
           {
@@ -399,7 +399,7 @@ export type Database = {
       pago: {
         Row: {
           created_at: string | null
-          created_by: number | null
+          created_by: string | null
           fecha: string | null
           id: number
           id_proveedor: number | null
@@ -408,11 +408,11 @@ export type Database = {
           monto: number | null
           observaciones: string | null
           updated_at: string | null
-          updated_by: number | null
+          updated_by: string | null
         }
         Insert: {
           created_at?: string | null
-          created_by?: number | null
+          created_by?: string | null
           fecha?: string | null
           id?: number
           id_proveedor?: number | null
@@ -421,11 +421,11 @@ export type Database = {
           monto?: number | null
           observaciones?: string | null
           updated_at?: string | null
-          updated_by?: number | null
+          updated_by?: string | null
         }
         Update: {
           created_at?: string | null
-          created_by?: number | null
+          created_by?: string | null
           fecha?: string | null
           id?: number
           id_proveedor?: number | null
@@ -434,7 +434,7 @@ export type Database = {
           monto?: number | null
           observaciones?: string | null
           updated_at?: string | null
-          updated_by?: number | null
+          updated_by?: string | null
         }
         Relationships: [
           {
@@ -456,33 +456,33 @@ export type Database = {
       pago_deuda: {
         Row: {
           created_at: string | null
-          created_by: number | null
+          created_by: string | null
           id: number
           id_deuda: number | null
           id_pago: number | null
           monto_aplicado: number | null
           updated_at: string | null
-          updated_by: number | null
+          updated_by: string | null
         }
         Insert: {
           created_at?: string | null
-          created_by?: number | null
+          created_by?: string | null
           id?: number
           id_deuda?: number | null
           id_pago?: number | null
           monto_aplicado?: number | null
           updated_at?: string | null
-          updated_by?: number | null
+          updated_by?: string | null
         }
         Update: {
           created_at?: string | null
-          created_by?: number | null
+          created_by?: string | null
           id?: number
           id_deuda?: number | null
           id_pago?: number | null
           monto_aplicado?: number | null
           updated_at?: string | null
-          updated_by?: number | null
+          updated_by?: string | null
         }
         Relationships: [
           {
@@ -504,38 +504,38 @@ export type Database = {
       politica_mora: {
         Row: {
           created_at: string | null
-          created_by: number | null
+          created_by: string | null
           dias_gracia: number | null
           estado: string | null
           id: number
           id_proveedor: number | null
           tipo: string | null
           updated_at: string | null
-          updated_by: number | null
+          updated_by: string | null
           valor: number | null
         }
         Insert: {
           created_at?: string | null
-          created_by?: number | null
+          created_by?: string | null
           dias_gracia?: number | null
           estado?: string | null
           id?: number
           id_proveedor?: number | null
           tipo?: string | null
           updated_at?: string | null
-          updated_by?: number | null
+          updated_by?: string | null
           valor?: number | null
         }
         Update: {
           created_at?: string | null
-          created_by?: number | null
+          created_by?: string | null
           dias_gracia?: number | null
           estado?: string | null
           id?: number
           id_proveedor?: number | null
           tipo?: string | null
           updated_at?: string | null
-          updated_by?: number | null
+          updated_by?: string | null
           valor?: number | null
         }
         Relationships: [
@@ -551,7 +551,7 @@ export type Database = {
       proveedor: {
         Row: {
           created_at: string | null
-          created_by: number | null
+          created_by: string | null
           direccion: string | null
           email: string | null
           estado: string | null
@@ -563,11 +563,11 @@ export type Database = {
           telefono: string | null
           tipo_documento: string
           updated_at: string | null
-          updated_by: number | null
+          updated_by: string | null
         }
         Insert: {
           created_at?: string | null
-          created_by?: number | null
+          created_by?: string | null
           direccion?: string | null
           email?: string | null
           estado?: string | null
@@ -579,11 +579,11 @@ export type Database = {
           telefono?: string | null
           tipo_documento: string
           updated_at?: string | null
-          updated_by?: number | null
+          updated_by?: string | null
         }
         Update: {
           created_at?: string | null
-          created_by?: number | null
+          created_by?: string | null
           direccion?: string | null
           email?: string | null
           estado?: string | null
@@ -595,14 +595,14 @@ export type Database = {
           telefono?: string | null
           tipo_documento?: string
           updated_at?: string | null
-          updated_by?: number | null
+          updated_by?: string | null
         }
         Relationships: []
       }
       punto_venta: {
         Row: {
           created_at: string | null
-          created_by: number | null
+          created_by: string | null
           direccion: string | null
           email: string | null
           estado: string | null
@@ -613,11 +613,11 @@ export type Database = {
           telefono: string | null
           tipo_documento: string
           updated_at: string | null
-          updated_by: number | null
+          updated_by: string | null
         }
         Insert: {
           created_at?: string | null
-          created_by?: number | null
+          created_by?: string | null
           direccion?: string | null
           email?: string | null
           estado?: string | null
@@ -628,11 +628,11 @@ export type Database = {
           telefono?: string | null
           tipo_documento: string
           updated_at?: string | null
-          updated_by?: number | null
+          updated_by?: string | null
         }
         Update: {
           created_at?: string | null
-          created_by?: number | null
+          created_by?: string | null
           direccion?: string | null
           email?: string | null
           estado?: string | null
@@ -643,14 +643,14 @@ export type Database = {
           telefono?: string | null
           tipo_documento?: string
           updated_at?: string | null
-          updated_by?: number | null
+          updated_by?: string | null
         }
         Relationships: []
       }
       usuario: {
         Row: {
           created_at: string | null
-          created_by: number | null
+          created_by: string | null
           email: string | null
           estado: string | null
           id: number
@@ -660,11 +660,11 @@ export type Database = {
           telefono: string | null
           tipo_documento: string | null
           updated_at: string | null
-          updated_by: number | null
+          updated_by: string | null
         }
         Insert: {
           created_at?: string | null
-          created_by?: number | null
+          created_by?: string | null
           email?: string | null
           estado?: string | null
           id?: number
@@ -674,11 +674,11 @@ export type Database = {
           telefono?: string | null
           tipo_documento?: string | null
           updated_at?: string | null
-          updated_by?: number | null
+          updated_by?: string | null
         }
         Update: {
           created_at?: string | null
-          created_by?: number | null
+          created_by?: string | null
           email?: string | null
           estado?: string | null
           id?: number
@@ -688,43 +688,43 @@ export type Database = {
           telefono?: string | null
           tipo_documento?: string | null
           updated_at?: string | null
-          updated_by?: number | null
+          updated_by?: string | null
         }
         Relationships: []
       }
       usuario_rol: {
         Row: {
           created_at: string | null
-          created_by: number | null
+          created_by: string | null
           fecha_asignacion: string | null
           id: number
           id_entidad: number | null
           id_usuario: number | null
           rol: string | null
           updated_at: string | null
-          updated_by: number | null
+          updated_by: string | null
         }
         Insert: {
           created_at?: string | null
-          created_by?: number | null
+          created_by?: string | null
           fecha_asignacion?: string | null
           id?: number
           id_entidad?: number | null
           id_usuario?: number | null
           rol?: string | null
           updated_at?: string | null
-          updated_by?: number | null
+          updated_by?: string | null
         }
         Update: {
           created_at?: string | null
-          created_by?: number | null
+          created_by?: string | null
           fecha_asignacion?: string | null
           id?: number
           id_entidad?: number | null
           id_usuario?: number | null
           rol?: string | null
           updated_at?: string | null
-          updated_by?: number | null
+          updated_by?: string | null
         }
         Relationships: [
           {
@@ -739,7 +739,7 @@ export type Database = {
       venta: {
         Row: {
           created_at: string | null
-          created_by: number | null
+          created_by: string | null
           estado: string | null
           fecha: string | null
           id: number
@@ -748,11 +748,11 @@ export type Database = {
           observaciones: string | null
           precio_total: number | null
           updated_at: string | null
-          updated_by: number | null
+          updated_by: string | null
         }
         Insert: {
           created_at?: string | null
-          created_by?: number | null
+          created_by?: string | null
           estado?: string | null
           fecha?: string | null
           id?: number
@@ -761,11 +761,11 @@ export type Database = {
           observaciones?: string | null
           precio_total?: number | null
           updated_at?: string | null
-          updated_by?: number | null
+          updated_by?: string | null
         }
         Update: {
           created_at?: string | null
-          created_by?: number | null
+          created_by?: string | null
           estado?: string | null
           fecha?: string | null
           id?: number
@@ -774,7 +774,7 @@ export type Database = {
           observaciones?: string | null
           precio_total?: number | null
           updated_at?: string | null
-          updated_by?: number | null
+          updated_by?: string | null
         }
         Relationships: [
           {
@@ -789,7 +789,7 @@ export type Database = {
       venta_certificado: {
         Row: {
           created_at: string | null
-          created_by: number | null
+          created_by: string | null
           descuento_aplicado: number | null
           estado: string | null
           ganancia_pv: number | null
@@ -799,11 +799,11 @@ export type Database = {
           monto_fijo_proveedor: number | null
           precio_venta: number | null
           updated_at: string | null
-          updated_by: number | null
+          updated_by: string | null
         }
         Insert: {
           created_at?: string | null
-          created_by?: number | null
+          created_by?: string | null
           descuento_aplicado?: number | null
           estado?: string | null
           ganancia_pv?: number | null
@@ -813,11 +813,11 @@ export type Database = {
           monto_fijo_proveedor?: number | null
           precio_venta?: number | null
           updated_at?: string | null
-          updated_by?: number | null
+          updated_by?: string | null
         }
         Update: {
           created_at?: string | null
-          created_by?: number | null
+          created_by?: string | null
           descuento_aplicado?: number | null
           estado?: string | null
           ganancia_pv?: number | null
@@ -827,7 +827,7 @@ export type Database = {
           monto_fijo_proveedor?: number | null
           precio_venta?: number | null
           updated_at?: string | null
-          updated_by?: number | null
+          updated_by?: string | null
         }
         Relationships: [
           {
@@ -849,7 +849,7 @@ export type Database = {
       visita: {
         Row: {
           created_at: string | null
-          created_by: number | null
+          created_by: string | null
           estado: string | null
           fecha: string | null
           id: number
@@ -859,11 +859,11 @@ export type Database = {
           motivo: string | null
           observaciones: string | null
           updated_at: string | null
-          updated_by: number | null
+          updated_by: string | null
         }
         Insert: {
           created_at?: string | null
-          created_by?: number | null
+          created_by?: string | null
           estado?: string | null
           fecha?: string | null
           id?: number
@@ -873,11 +873,11 @@ export type Database = {
           motivo?: string | null
           observaciones?: string | null
           updated_at?: string | null
-          updated_by?: number | null
+          updated_by?: string | null
         }
         Update: {
           created_at?: string | null
-          created_by?: number | null
+          created_by?: string | null
           estado?: string | null
           fecha?: string | null
           id?: number
@@ -887,7 +887,7 @@ export type Database = {
           motivo?: string | null
           observaciones?: string | null
           updated_at?: string | null
-          updated_by?: number | null
+          updated_by?: string | null
         }
         Relationships: [
           {
@@ -916,36 +916,36 @@ export type Database = {
       zona: {
         Row: {
           created_at: string | null
-          created_by: number | null
+          created_by: string | null
           descripcion: string | null
           estado: string | null
           id: number
           id_proveedor: number | null
           nombre: string | null
           updated_at: string | null
-          updated_by: number | null
+          updated_by: string | null
         }
         Insert: {
           created_at?: string | null
-          created_by?: number | null
+          created_by?: string | null
           descripcion?: string | null
           estado?: string | null
           id?: number
           id_proveedor?: number | null
           nombre?: string | null
           updated_at?: string | null
-          updated_by?: number | null
+          updated_by?: string | null
         }
         Update: {
           created_at?: string | null
-          created_by?: number | null
+          created_by?: string | null
           descripcion?: string | null
           estado?: string | null
           id?: number
           id_proveedor?: number | null
           nombre?: string | null
           updated_at?: string | null
-          updated_by?: number | null
+          updated_by?: string | null
         }
         Relationships: [
           {
@@ -960,36 +960,36 @@ export type Database = {
       zona_punto_venta: {
         Row: {
           created_at: string | null
-          created_by: number | null
+          created_by: string | null
           estado: string | null
           fecha_asignacion: string | null
           id: number
           id_punto_venta: number | null
           id_zona: number | null
           updated_at: string | null
-          updated_by: number | null
+          updated_by: string | null
         }
         Insert: {
           created_at?: string | null
-          created_by?: number | null
+          created_by?: string | null
           estado?: string | null
           fecha_asignacion?: string | null
           id?: number
           id_punto_venta?: number | null
           id_zona?: number | null
           updated_at?: string | null
-          updated_by?: number | null
+          updated_by?: string | null
         }
         Update: {
           created_at?: string | null
-          created_by?: number | null
+          created_by?: string | null
           estado?: string | null
           fecha_asignacion?: string | null
           id?: number
           id_punto_venta?: number | null
           id_zona?: number | null
           updated_at?: string | null
-          updated_by?: number | null
+          updated_by?: string | null
         }
         Relationships: [
           {

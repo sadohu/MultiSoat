@@ -44,42 +44,59 @@ export type Database = {
           created_at: string | null
           created_by: string | null
           estado: string | null
-          fecha_verificacion: string | null
+          fecha_aprobacion: string | null
           id: number
           id_distribuidor: number | null
-          id_proveedor: number | null
-          id_punto_venta: number | null
+          id_proveedor: number
+          id_punto_venta: number
+          observaciones: string | null
           updated_at: string | null
           updated_by: string | null
-          usuario_verificador: number | null
+          usuario_aprobador: string | null
         }
         Insert: {
           created_at?: string | null
           created_by?: string | null
           estado?: string | null
-          fecha_verificacion?: string | null
+          fecha_aprobacion?: string | null
           id?: number
           id_distribuidor?: number | null
-          id_proveedor?: number | null
-          id_punto_venta?: number | null
+          id_proveedor: number
+          id_punto_venta: number
+          observaciones?: string | null
           updated_at?: string | null
           updated_by?: string | null
-          usuario_verificador?: number | null
+          usuario_aprobador?: string | null
         }
         Update: {
           created_at?: string | null
           created_by?: string | null
           estado?: string | null
-          fecha_verificacion?: string | null
+          fecha_aprobacion?: string | null
           id?: number
           id_distribuidor?: number | null
-          id_proveedor?: number | null
-          id_punto_venta?: number | null
+          id_proveedor?: number
+          id_punto_venta?: number
+          observaciones?: string | null
           updated_at?: string | null
           updated_by?: string | null
-          usuario_verificador?: number | null
+          usuario_aprobador?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "afiliacion_pv_proveedor_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "usuario"
+            referencedColumns: ["id_supabase"]
+          },
+          {
+            foreignKeyName: "afiliacion_pv_proveedor_estado_fkey"
+            columns: ["estado"]
+            isOneToOne: false
+            referencedRelation: "cat_estados_afiliacion"
+            referencedColumns: ["codigo"]
+          },
           {
             foreignKeyName: "afiliacion_pv_proveedor_id_distribuidor_fkey"
             columns: ["id_distribuidor"]
@@ -101,7 +118,514 @@ export type Database = {
             referencedRelation: "punto_venta"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "afiliacion_pv_proveedor_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "usuario"
+            referencedColumns: ["id_supabase"]
+          },
+          {
+            foreignKeyName: "afiliacion_pv_proveedor_usuario_aprobador_fkey"
+            columns: ["usuario_aprobador"]
+            isOneToOne: false
+            referencedRelation: "usuario"
+            referencedColumns: ["id_supabase"]
+          },
         ]
+      }
+      asignacion_certificado: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          estado: string | null
+          fecha_asignacion: string | null
+          id: number
+          id_certificado: number
+          id_distribuidor: number | null
+          id_punto_venta: number | null
+          tipo_asignacion: string
+          updated_at: string | null
+          updated_by: string | null
+          usuario_asignacion: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          estado?: string | null
+          fecha_asignacion?: string | null
+          id?: number
+          id_certificado: number
+          id_distribuidor?: number | null
+          id_punto_venta?: number | null
+          tipo_asignacion: string
+          updated_at?: string | null
+          updated_by?: string | null
+          usuario_asignacion?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          estado?: string | null
+          fecha_asignacion?: string | null
+          id?: number
+          id_certificado?: number
+          id_distribuidor?: number | null
+          id_punto_venta?: number | null
+          tipo_asignacion?: string
+          updated_at?: string | null
+          updated_by?: string | null
+          usuario_asignacion?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "asignacion_certificado_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "usuario"
+            referencedColumns: ["id_supabase"]
+          },
+          {
+            foreignKeyName: "asignacion_certificado_id_certificado_fkey"
+            columns: ["id_certificado"]
+            isOneToOne: false
+            referencedRelation: "certificado"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "asignacion_certificado_id_distribuidor_fkey"
+            columns: ["id_distribuidor"]
+            isOneToOne: false
+            referencedRelation: "distribuidor"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "asignacion_certificado_id_punto_venta_fkey"
+            columns: ["id_punto_venta"]
+            isOneToOne: false
+            referencedRelation: "punto_venta"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "asignacion_certificado_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "usuario"
+            referencedColumns: ["id_supabase"]
+          },
+          {
+            foreignKeyName: "asignacion_certificado_usuario_asignacion_fkey"
+            columns: ["usuario_asignacion"]
+            isOneToOne: false
+            referencedRelation: "usuario"
+            referencedColumns: ["id_supabase"]
+          },
+        ]
+      }
+      cat_categorias_certificado: {
+        Row: {
+          activo: boolean | null
+          categoria: string
+          clase: string
+          codigo: string
+          created_at: string | null
+          created_by: string | null
+          descripcion: string
+          id: number
+          servicio: string
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          activo?: boolean | null
+          categoria: string
+          clase: string
+          codigo: string
+          created_at?: string | null
+          created_by?: string | null
+          descripcion: string
+          id?: number
+          servicio: string
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          activo?: boolean | null
+          categoria?: string
+          clase?: string
+          codigo?: string
+          created_at?: string | null
+          created_by?: string | null
+          descripcion?: string
+          id?: number
+          servicio?: string
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
+      cat_estados_afiliacion: {
+        Row: {
+          activo: boolean | null
+          codigo: string
+          created_at: string | null
+          created_by: string | null
+          descripcion: string
+          id: number
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          activo?: boolean | null
+          codigo: string
+          created_at?: string | null
+          created_by?: string | null
+          descripcion: string
+          id?: number
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          activo?: boolean | null
+          codigo?: string
+          created_at?: string | null
+          created_by?: string | null
+          descripcion?: string
+          id?: number
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
+      cat_estados_certificado: {
+        Row: {
+          activo: boolean | null
+          codigo: string
+          created_at: string | null
+          created_by: string | null
+          descripcion: string
+          id: number
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          activo?: boolean | null
+          codigo: string
+          created_at?: string | null
+          created_by?: string | null
+          descripcion: string
+          id?: number
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          activo?: boolean | null
+          codigo?: string
+          created_at?: string | null
+          created_by?: string | null
+          descripcion?: string
+          id?: number
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
+      cat_estados_deuda: {
+        Row: {
+          activo: boolean | null
+          codigo: string
+          created_at: string | null
+          created_by: string | null
+          descripcion: string
+          id: number
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          activo?: boolean | null
+          codigo: string
+          created_at?: string | null
+          created_by?: string | null
+          descripcion: string
+          id?: number
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          activo?: boolean | null
+          codigo?: string
+          created_at?: string | null
+          created_by?: string | null
+          descripcion?: string
+          id?: number
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
+      cat_estados_entidad: {
+        Row: {
+          activo: boolean | null
+          codigo: string
+          created_at: string | null
+          created_by: string | null
+          descripcion: string
+          id: number
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          activo?: boolean | null
+          codigo: string
+          created_at?: string | null
+          created_by?: string | null
+          descripcion: string
+          id?: number
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          activo?: boolean | null
+          codigo?: string
+          created_at?: string | null
+          created_by?: string | null
+          descripcion?: string
+          id?: number
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
+      cat_estados_venta: {
+        Row: {
+          activo: boolean | null
+          codigo: string
+          created_at: string | null
+          created_by: string | null
+          descripcion: string
+          id: number
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          activo?: boolean | null
+          codigo: string
+          created_at?: string | null
+          created_by?: string | null
+          descripcion: string
+          id?: number
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          activo?: boolean | null
+          codigo?: string
+          created_at?: string | null
+          created_by?: string | null
+          descripcion?: string
+          id?: number
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
+      cat_estados_visita: {
+        Row: {
+          activo: boolean | null
+          codigo: string
+          created_at: string | null
+          created_by: string | null
+          descripcion: string
+          id: number
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          activo?: boolean | null
+          codigo: string
+          created_at?: string | null
+          created_by?: string | null
+          descripcion: string
+          id?: number
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          activo?: boolean | null
+          codigo?: string
+          created_at?: string | null
+          created_by?: string | null
+          descripcion?: string
+          id?: number
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
+      cat_motivos_visita: {
+        Row: {
+          activo: boolean | null
+          codigo: string
+          created_at: string | null
+          created_by: string | null
+          descripcion: string
+          id: number
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          activo?: boolean | null
+          codigo: string
+          created_at?: string | null
+          created_by?: string | null
+          descripcion: string
+          id?: number
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          activo?: boolean | null
+          codigo?: string
+          created_at?: string | null
+          created_by?: string | null
+          descripcion?: string
+          id?: number
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
+      cat_tipos_descuento: {
+        Row: {
+          activo: boolean | null
+          codigo: string
+          created_at: string | null
+          created_by: string | null
+          descripcion: string
+          id: number
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          activo?: boolean | null
+          codigo: string
+          created_at?: string | null
+          created_by?: string | null
+          descripcion: string
+          id?: number
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          activo?: boolean | null
+          codigo?: string
+          created_at?: string | null
+          created_by?: string | null
+          descripcion?: string
+          id?: number
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
+      cat_tipos_documento: {
+        Row: {
+          activo: boolean | null
+          codigo: string
+          created_at: string | null
+          created_by: string | null
+          descripcion: string
+          id: number
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          activo?: boolean | null
+          codigo: string
+          created_at?: string | null
+          created_by?: string | null
+          descripcion: string
+          id?: number
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          activo?: boolean | null
+          codigo?: string
+          created_at?: string | null
+          created_by?: string | null
+          descripcion?: string
+          id?: number
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
+      cat_tipos_mora: {
+        Row: {
+          activo: boolean | null
+          codigo: string
+          created_at: string | null
+          created_by: string | null
+          descripcion: string
+          id: number
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          activo?: boolean | null
+          codigo: string
+          created_at?: string | null
+          created_by?: string | null
+          descripcion: string
+          id?: number
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          activo?: boolean | null
+          codigo?: string
+          created_at?: string | null
+          created_by?: string | null
+          descripcion?: string
+          id?: number
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
+      cat_tipos_pago: {
+        Row: {
+          activo: boolean | null
+          codigo: string
+          created_at: string | null
+          created_by: string | null
+          descripcion: string
+          id: number
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          activo?: boolean | null
+          codigo: string
+          created_at?: string | null
+          created_by?: string | null
+          descripcion: string
+          id?: number
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          activo?: boolean | null
+          codigo?: string
+          created_at?: string | null
+          created_by?: string | null
+          descripcion?: string
+          id?: number
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Relationships: []
       }
       certificado: {
         Row: {
@@ -110,12 +634,10 @@ export type Database = {
           created_by: string | null
           datos_vehiculo_externo: string | null
           estado: string | null
-          fecha_asignacion: string | null
           fecha_registro: string | null
-          fecha_venta: string | null
           foto_url: string | null
           id: number
-          id_proveedor: number | null
+          id_proveedor: number
           numero_serie: string
           updated_at: string | null
           updated_by: string | null
@@ -126,12 +648,10 @@ export type Database = {
           created_by?: string | null
           datos_vehiculo_externo?: string | null
           estado?: string | null
-          fecha_asignacion?: string | null
           fecha_registro?: string | null
-          fecha_venta?: string | null
           foto_url?: string | null
           id?: number
-          id_proveedor?: number | null
+          id_proveedor: number
           numero_serie: string
           updated_at?: string | null
           updated_by?: string | null
@@ -142,17 +662,36 @@ export type Database = {
           created_by?: string | null
           datos_vehiculo_externo?: string | null
           estado?: string | null
-          fecha_asignacion?: string | null
           fecha_registro?: string | null
-          fecha_venta?: string | null
           foto_url?: string | null
           id?: number
-          id_proveedor?: number | null
+          id_proveedor?: number
           numero_serie?: string
           updated_at?: string | null
           updated_by?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "certificado_categoria_fkey"
+            columns: ["categoria"]
+            isOneToOne: false
+            referencedRelation: "cat_categorias_certificado"
+            referencedColumns: ["codigo"]
+          },
+          {
+            foreignKeyName: "certificado_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "usuario"
+            referencedColumns: ["id_supabase"]
+          },
+          {
+            foreignKeyName: "certificado_estado_fkey"
+            columns: ["estado"]
+            isOneToOne: false
+            referencedRelation: "cat_estados_certificado"
+            referencedColumns: ["codigo"]
+          },
           {
             foreignKeyName: "certificado_id_proveedor_fkey"
             columns: ["id_proveedor"]
@@ -160,46 +699,66 @@ export type Database = {
             referencedRelation: "proveedor"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "certificado_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "usuario"
+            referencedColumns: ["id_supabase"]
+          },
         ]
       }
       credito: {
         Row: {
+          activo: boolean | null
           created_at: string | null
           created_by: string | null
-          estado: string | null
+          fecha_otorgamiento: string | null
+          fecha_vencimiento: string | null
           id: number
-          id_proveedor: number | null
-          id_punto_venta: number | null
-          limite_credito: number | null
-          stock_actual: number | null
+          id_proveedor: number
+          id_punto_venta: number
+          limite_credito: number
+          saldo_actual: number | null
           updated_at: string | null
           updated_by: string | null
         }
         Insert: {
+          activo?: boolean | null
           created_at?: string | null
           created_by?: string | null
-          estado?: string | null
+          fecha_otorgamiento?: string | null
+          fecha_vencimiento?: string | null
           id?: number
-          id_proveedor?: number | null
-          id_punto_venta?: number | null
-          limite_credito?: number | null
-          stock_actual?: number | null
+          id_proveedor: number
+          id_punto_venta: number
+          limite_credito: number
+          saldo_actual?: number | null
           updated_at?: string | null
           updated_by?: string | null
         }
         Update: {
+          activo?: boolean | null
           created_at?: string | null
           created_by?: string | null
-          estado?: string | null
+          fecha_otorgamiento?: string | null
+          fecha_vencimiento?: string | null
           id?: number
-          id_proveedor?: number | null
-          id_punto_venta?: number | null
-          limite_credito?: number | null
-          stock_actual?: number | null
+          id_proveedor?: number
+          id_punto_venta?: number
+          limite_credito?: number
+          saldo_actual?: number | null
           updated_at?: string | null
           updated_by?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "credito_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "usuario"
+            referencedColumns: ["id_supabase"]
+          },
           {
             foreignKeyName: "credito_id_proveedor_fkey"
             columns: ["id_proveedor"]
@@ -214,52 +773,69 @@ export type Database = {
             referencedRelation: "punto_venta"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "credito_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "usuario"
+            referencedColumns: ["id_supabase"]
+          },
         ]
       }
       descuento_pv: {
         Row: {
+          activo: boolean | null
           created_at: string | null
           created_by: string | null
-          estado: string | null
           fecha_fin: string | null
-          fecha_inicio: string | null
+          fecha_inicio: string
           id: number
-          id_proveedor: number | null
-          id_punto_venta: number | null
+          id_proveedor: number
+          id_punto_venta: number
           monto_fijo: number | null
           porcentaje: number | null
+          tipo_descuento: string | null
           updated_at: string | null
           updated_by: string | null
         }
         Insert: {
+          activo?: boolean | null
           created_at?: string | null
           created_by?: string | null
-          estado?: string | null
           fecha_fin?: string | null
-          fecha_inicio?: string | null
+          fecha_inicio: string
           id?: number
-          id_proveedor?: number | null
-          id_punto_venta?: number | null
+          id_proveedor: number
+          id_punto_venta: number
           monto_fijo?: number | null
           porcentaje?: number | null
+          tipo_descuento?: string | null
           updated_at?: string | null
           updated_by?: string | null
         }
         Update: {
+          activo?: boolean | null
           created_at?: string | null
           created_by?: string | null
-          estado?: string | null
           fecha_fin?: string | null
-          fecha_inicio?: string | null
+          fecha_inicio?: string
           id?: number
-          id_proveedor?: number | null
-          id_punto_venta?: number | null
+          id_proveedor?: number
+          id_punto_venta?: number
           monto_fijo?: number | null
           porcentaje?: number | null
+          tipo_descuento?: string | null
           updated_at?: string | null
           updated_by?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "descuento_pv_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "usuario"
+            referencedColumns: ["id_supabase"]
+          },
           {
             foreignKeyName: "descuento_pv_id_proveedor_fkey"
             columns: ["id_proveedor"]
@@ -274,6 +850,20 @@ export type Database = {
             referencedRelation: "punto_venta"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "descuento_pv_tipo_descuento_fkey"
+            columns: ["tipo_descuento"]
+            isOneToOne: false
+            referencedRelation: "cat_tipos_descuento"
+            referencedColumns: ["codigo"]
+          },
+          {
+            foreignKeyName: "descuento_pv_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "usuario"
+            referencedColumns: ["id_supabase"]
+          },
         ]
       }
       deuda: {
@@ -281,13 +871,13 @@ export type Database = {
           created_at: string | null
           created_by: string | null
           estado: string | null
-          fecha_vencimiento: string | null
+          fecha_vencimiento: string
           id: number
-          id_proveedor: number | null
-          id_punto_venta: number | null
-          id_venta: number | null
-          monto_original: number | null
-          monto_pendiente: number | null
+          id_proveedor: number
+          id_punto_venta: number
+          id_venta: number
+          monto_original: number
+          monto_pendiente: number
           mora_acumulada: number | null
           updated_at: string | null
           updated_by: string | null
@@ -296,13 +886,13 @@ export type Database = {
           created_at?: string | null
           created_by?: string | null
           estado?: string | null
-          fecha_vencimiento?: string | null
+          fecha_vencimiento: string
           id?: number
-          id_proveedor?: number | null
-          id_punto_venta?: number | null
-          id_venta?: number | null
-          monto_original?: number | null
-          monto_pendiente?: number | null
+          id_proveedor: number
+          id_punto_venta: number
+          id_venta: number
+          monto_original: number
+          monto_pendiente: number
           mora_acumulada?: number | null
           updated_at?: string | null
           updated_by?: string | null
@@ -311,18 +901,32 @@ export type Database = {
           created_at?: string | null
           created_by?: string | null
           estado?: string | null
-          fecha_vencimiento?: string | null
+          fecha_vencimiento?: string
           id?: number
-          id_proveedor?: number | null
-          id_punto_venta?: number | null
-          id_venta?: number | null
-          monto_original?: number | null
-          monto_pendiente?: number | null
+          id_proveedor?: number
+          id_punto_venta?: number
+          id_venta?: number
+          monto_original?: number
+          monto_pendiente?: number
           mora_acumulada?: number | null
           updated_at?: string | null
           updated_by?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "deuda_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "usuario"
+            referencedColumns: ["id_supabase"]
+          },
+          {
+            foreignKeyName: "deuda_estado_fkey"
+            columns: ["estado"]
+            isOneToOne: false
+            referencedRelation: "cat_estados_deuda"
+            referencedColumns: ["codigo"]
+          },
           {
             foreignKeyName: "deuda_id_proveedor_fkey"
             columns: ["id_proveedor"]
@@ -344,17 +948,24 @@ export type Database = {
             referencedRelation: "venta"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "deuda_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "usuario"
+            referencedColumns: ["id_supabase"]
+          },
         ]
       }
       distribuidor: {
         Row: {
           created_at: string | null
           created_by: string | null
-          email: string | null
+          email: string
           estado: string | null
           id: number
           id_externo_db_data: string | null
-          id_proveedor: number | null
+          id_proveedor: number
           nombre: string | null
           telefono: string | null
           updated_at: string | null
@@ -363,11 +974,11 @@ export type Database = {
         Insert: {
           created_at?: string | null
           created_by?: string | null
-          email?: string | null
+          email: string
           estado?: string | null
           id?: number
           id_externo_db_data?: string | null
-          id_proveedor?: number | null
+          id_proveedor: number
           nombre?: string | null
           telefono?: string | null
           updated_at?: string | null
@@ -376,11 +987,11 @@ export type Database = {
         Update: {
           created_at?: string | null
           created_by?: string | null
-          email?: string | null
+          email?: string
           estado?: string | null
           id?: number
           id_externo_db_data?: string | null
-          id_proveedor?: number | null
+          id_proveedor?: number
           nombre?: string | null
           telefono?: string | null
           updated_at?: string | null
@@ -388,11 +999,32 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "distribuidor_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "usuario"
+            referencedColumns: ["id_supabase"]
+          },
+          {
+            foreignKeyName: "distribuidor_estado_fkey"
+            columns: ["estado"]
+            isOneToOne: false
+            referencedRelation: "cat_estados_entidad"
+            referencedColumns: ["codigo"]
+          },
+          {
             foreignKeyName: "distribuidor_id_proveedor_fkey"
             columns: ["id_proveedor"]
             isOneToOne: false
             referencedRelation: "proveedor"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "distribuidor_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "usuario"
+            referencedColumns: ["id_supabase"]
           },
         ]
       }
@@ -400,43 +1032,53 @@ export type Database = {
         Row: {
           created_at: string | null
           created_by: string | null
-          fecha: string | null
+          fecha_pago: string | null
           id: number
-          id_proveedor: number | null
-          id_punto_venta: number | null
-          modalidad: string | null
-          monto: number | null
+          id_proveedor: number
+          id_punto_venta: number
+          monto: number
+          numero_operacion: string | null
           observaciones: string | null
+          tipo_pago: string | null
           updated_at: string | null
           updated_by: string | null
         }
         Insert: {
           created_at?: string | null
           created_by?: string | null
-          fecha?: string | null
+          fecha_pago?: string | null
           id?: number
-          id_proveedor?: number | null
-          id_punto_venta?: number | null
-          modalidad?: string | null
-          monto?: number | null
+          id_proveedor: number
+          id_punto_venta: number
+          monto: number
+          numero_operacion?: string | null
           observaciones?: string | null
+          tipo_pago?: string | null
           updated_at?: string | null
           updated_by?: string | null
         }
         Update: {
           created_at?: string | null
           created_by?: string | null
-          fecha?: string | null
+          fecha_pago?: string | null
           id?: number
-          id_proveedor?: number | null
-          id_punto_venta?: number | null
-          modalidad?: string | null
-          monto?: number | null
+          id_proveedor?: number
+          id_punto_venta?: number
+          monto?: number
+          numero_operacion?: string | null
           observaciones?: string | null
+          tipo_pago?: string | null
           updated_at?: string | null
           updated_by?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "pago_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "usuario"
+            referencedColumns: ["id_supabase"]
+          },
           {
             foreignKeyName: "pago_id_proveedor_fkey"
             columns: ["id_proveedor"]
@@ -451,6 +1093,20 @@ export type Database = {
             referencedRelation: "punto_venta"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "pago_tipo_pago_fkey"
+            columns: ["tipo_pago"]
+            isOneToOne: false
+            referencedRelation: "cat_tipos_pago"
+            referencedColumns: ["codigo"]
+          },
+          {
+            foreignKeyName: "pago_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "usuario"
+            referencedColumns: ["id_supabase"]
+          },
         ]
       }
       pago_deuda: {
@@ -458,9 +1114,9 @@ export type Database = {
           created_at: string | null
           created_by: string | null
           id: number
-          id_deuda: number | null
-          id_pago: number | null
-          monto_aplicado: number | null
+          id_deuda: number
+          id_pago: number
+          monto_aplicado: number
           updated_at: string | null
           updated_by: string | null
         }
@@ -468,9 +1124,9 @@ export type Database = {
           created_at?: string | null
           created_by?: string | null
           id?: number
-          id_deuda?: number | null
-          id_pago?: number | null
-          monto_aplicado?: number | null
+          id_deuda: number
+          id_pago: number
+          monto_aplicado: number
           updated_at?: string | null
           updated_by?: string | null
         }
@@ -478,13 +1134,20 @@ export type Database = {
           created_at?: string | null
           created_by?: string | null
           id?: number
-          id_deuda?: number | null
-          id_pago?: number | null
-          monto_aplicado?: number | null
+          id_deuda?: number
+          id_pago?: number
+          monto_aplicado?: number
           updated_at?: string | null
           updated_by?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "pago_deuda_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "usuario"
+            referencedColumns: ["id_supabase"]
+          },
           {
             foreignKeyName: "pago_deuda_id_deuda_fkey"
             columns: ["id_deuda"]
@@ -499,52 +1162,119 @@ export type Database = {
             referencedRelation: "pago"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "pago_deuda_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "usuario"
+            referencedColumns: ["id_supabase"]
+          },
         ]
+      }
+      permiso: {
+        Row: {
+          activo: boolean | null
+          codigo: string
+          created_at: string | null
+          created_by: string | null
+          descripcion: string | null
+          id: number
+          modulo: string | null
+          nombre: string
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          activo?: boolean | null
+          codigo: string
+          created_at?: string | null
+          created_by?: string | null
+          descripcion?: string | null
+          id?: number
+          modulo?: string | null
+          nombre: string
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          activo?: boolean | null
+          codigo?: string
+          created_at?: string | null
+          created_by?: string | null
+          descripcion?: string | null
+          id?: number
+          modulo?: string | null
+          nombre?: string
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Relationships: []
       }
       politica_mora: {
         Row: {
+          activo: boolean | null
           created_at: string | null
           created_by: string | null
           dias_gracia: number | null
-          estado: string | null
           id: number
-          id_proveedor: number | null
-          tipo: string | null
+          id_proveedor: number
+          tipo_mora: string | null
           updated_at: string | null
           updated_by: string | null
-          valor: number | null
+          valor: number
         }
         Insert: {
+          activo?: boolean | null
           created_at?: string | null
           created_by?: string | null
           dias_gracia?: number | null
-          estado?: string | null
           id?: number
-          id_proveedor?: number | null
-          tipo?: string | null
+          id_proveedor: number
+          tipo_mora?: string | null
           updated_at?: string | null
           updated_by?: string | null
-          valor?: number | null
+          valor: number
         }
         Update: {
+          activo?: boolean | null
           created_at?: string | null
           created_by?: string | null
           dias_gracia?: number | null
-          estado?: string | null
           id?: number
-          id_proveedor?: number | null
-          tipo?: string | null
+          id_proveedor?: number
+          tipo_mora?: string | null
           updated_at?: string | null
           updated_by?: string | null
-          valor?: number | null
+          valor?: number
         }
         Relationships: [
+          {
+            foreignKeyName: "politica_mora_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "usuario"
+            referencedColumns: ["id_supabase"]
+          },
           {
             foreignKeyName: "politica_mora_id_proveedor_fkey"
             columns: ["id_proveedor"]
             isOneToOne: false
             referencedRelation: "proveedor"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "politica_mora_tipo_mora_fkey"
+            columns: ["tipo_mora"]
+            isOneToOne: false
+            referencedRelation: "cat_tipos_mora"
+            referencedColumns: ["codigo"]
+          },
+          {
+            foreignKeyName: "politica_mora_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "usuario"
+            referencedColumns: ["id_supabase"]
           },
         ]
       }
@@ -553,7 +1283,7 @@ export type Database = {
           created_at: string | null
           created_by: string | null
           direccion: string | null
-          email: string | null
+          email: string
           estado: string | null
           id: number
           id_externo_db_data: string | null
@@ -569,7 +1299,7 @@ export type Database = {
           created_at?: string | null
           created_by?: string | null
           direccion?: string | null
-          email?: string | null
+          email: string
           estado?: string | null
           id?: number
           id_externo_db_data?: string | null
@@ -585,7 +1315,7 @@ export type Database = {
           created_at?: string | null
           created_by?: string | null
           direccion?: string | null
-          email?: string | null
+          email?: string
           estado?: string | null
           id?: number
           id_externo_db_data?: string | null
@@ -597,14 +1327,43 @@ export type Database = {
           updated_at?: string | null
           updated_by?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "proveedor_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "usuario"
+            referencedColumns: ["id_supabase"]
+          },
+          {
+            foreignKeyName: "proveedor_estado_fkey"
+            columns: ["estado"]
+            isOneToOne: false
+            referencedRelation: "cat_estados_entidad"
+            referencedColumns: ["codigo"]
+          },
+          {
+            foreignKeyName: "proveedor_tipo_documento_fkey"
+            columns: ["tipo_documento"]
+            isOneToOne: false
+            referencedRelation: "cat_tipos_documento"
+            referencedColumns: ["codigo"]
+          },
+          {
+            foreignKeyName: "proveedor_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "usuario"
+            referencedColumns: ["id_supabase"]
+          },
+        ]
       }
       punto_venta: {
         Row: {
           created_at: string | null
           created_by: string | null
           direccion: string | null
-          email: string | null
+          email: string
           estado: string | null
           id: number
           id_externo_db_data: string | null
@@ -619,7 +1378,7 @@ export type Database = {
           created_at?: string | null
           created_by?: string | null
           direccion?: string | null
-          email?: string | null
+          email: string
           estado?: string | null
           id?: number
           id_externo_db_data?: string | null
@@ -634,7 +1393,7 @@ export type Database = {
           created_at?: string | null
           created_by?: string | null
           direccion?: string | null
-          email?: string | null
+          email?: string
           estado?: string | null
           id?: number
           id_externo_db_data?: string | null
@@ -645,16 +1404,129 @@ export type Database = {
           updated_at?: string | null
           updated_by?: string | null
         }
+        Relationships: [
+          {
+            foreignKeyName: "punto_venta_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "usuario"
+            referencedColumns: ["id_supabase"]
+          },
+          {
+            foreignKeyName: "punto_venta_estado_fkey"
+            columns: ["estado"]
+            isOneToOne: false
+            referencedRelation: "cat_estados_entidad"
+            referencedColumns: ["codigo"]
+          },
+          {
+            foreignKeyName: "punto_venta_tipo_documento_fkey"
+            columns: ["tipo_documento"]
+            isOneToOne: false
+            referencedRelation: "cat_tipos_documento"
+            referencedColumns: ["codigo"]
+          },
+          {
+            foreignKeyName: "punto_venta_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "usuario"
+            referencedColumns: ["id_supabase"]
+          },
+        ]
+      }
+      rol: {
+        Row: {
+          activo: boolean | null
+          codigo: string
+          created_at: string | null
+          created_by: string | null
+          descripcion: string | null
+          id: number
+          nivel_jerarquico: number
+          nombre: string
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          activo?: boolean | null
+          codigo: string
+          created_at?: string | null
+          created_by?: string | null
+          descripcion?: string | null
+          id?: number
+          nivel_jerarquico: number
+          nombre: string
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          activo?: boolean | null
+          codigo?: string
+          created_at?: string | null
+          created_by?: string | null
+          descripcion?: string | null
+          id?: number
+          nivel_jerarquico?: number
+          nombre?: string
+          updated_at?: string | null
+          updated_by?: string | null
+        }
         Relationships: []
+      }
+      rol_permiso: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          id: number
+          id_permiso: number | null
+          id_rol: number | null
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          id?: number
+          id_permiso?: number | null
+          id_rol?: number | null
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          id?: number
+          id_permiso?: number | null
+          id_rol?: number | null
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rol_permiso_id_permiso_fkey"
+            columns: ["id_permiso"]
+            isOneToOne: false
+            referencedRelation: "permiso"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rol_permiso_id_rol_fkey"
+            columns: ["id_rol"]
+            isOneToOne: false
+            referencedRelation: "rol"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       usuario: {
         Row: {
           created_at: string | null
           created_by: string | null
-          email: string | null
+          email: string
           estado: string | null
           id: number
-          id_supabase: string | null
+          id_supabase: string
           nombre: string | null
           numero_documento: string | null
           telefono: string | null
@@ -665,10 +1537,10 @@ export type Database = {
         Insert: {
           created_at?: string | null
           created_by?: string | null
-          email?: string | null
+          email: string
           estado?: string | null
           id?: number
-          id_supabase?: string | null
+          id_supabase: string
           nombre?: string | null
           numero_documento?: string | null
           telefono?: string | null
@@ -679,10 +1551,10 @@ export type Database = {
         Update: {
           created_at?: string | null
           created_by?: string | null
-          email?: string | null
+          email?: string
           estado?: string | null
           id?: number
-          id_supabase?: string | null
+          id_supabase?: string
           nombre?: string | null
           numero_documento?: string | null
           telefono?: string | null
@@ -694,39 +1566,55 @@ export type Database = {
       }
       usuario_rol: {
         Row: {
+          activo: boolean | null
           created_at: string | null
           created_by: string | null
           fecha_asignacion: string | null
+          fecha_expiracion: string | null
           id: number
           id_entidad: number | null
+          id_rol: number | null
           id_usuario: number | null
-          rol: string | null
+          tipo_entidad: string | null
           updated_at: string | null
           updated_by: string | null
         }
         Insert: {
+          activo?: boolean | null
           created_at?: string | null
           created_by?: string | null
           fecha_asignacion?: string | null
+          fecha_expiracion?: string | null
           id?: number
           id_entidad?: number | null
+          id_rol?: number | null
           id_usuario?: number | null
-          rol?: string | null
+          tipo_entidad?: string | null
           updated_at?: string | null
           updated_by?: string | null
         }
         Update: {
+          activo?: boolean | null
           created_at?: string | null
           created_by?: string | null
           fecha_asignacion?: string | null
+          fecha_expiracion?: string | null
           id?: number
           id_entidad?: number | null
+          id_rol?: number | null
           id_usuario?: number | null
-          rol?: string | null
+          tipo_entidad?: string | null
           updated_at?: string | null
           updated_by?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "usuario_rol_id_rol_fkey"
+            columns: ["id_rol"]
+            isOneToOne: false
+            referencedRelation: "rol"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "usuario_rol_id_usuario_fkey"
             columns: ["id_usuario"]
@@ -741,12 +1629,12 @@ export type Database = {
           created_at: string | null
           created_by: string | null
           estado: string | null
-          fecha: string | null
+          fecha_venta: string | null
           id: number
           id_cliente_externo: string | null
-          id_punto_venta: number | null
+          id_punto_venta: number
           observaciones: string | null
-          precio_total: number | null
+          precio_total: number
           updated_at: string | null
           updated_by: string | null
         }
@@ -754,12 +1642,12 @@ export type Database = {
           created_at?: string | null
           created_by?: string | null
           estado?: string | null
-          fecha?: string | null
+          fecha_venta?: string | null
           id?: number
           id_cliente_externo?: string | null
-          id_punto_venta?: number | null
+          id_punto_venta: number
           observaciones?: string | null
-          precio_total?: number | null
+          precio_total: number
           updated_at?: string | null
           updated_by?: string | null
         }
@@ -767,22 +1655,43 @@ export type Database = {
           created_at?: string | null
           created_by?: string | null
           estado?: string | null
-          fecha?: string | null
+          fecha_venta?: string | null
           id?: number
           id_cliente_externo?: string | null
-          id_punto_venta?: number | null
+          id_punto_venta?: number
           observaciones?: string | null
-          precio_total?: number | null
+          precio_total?: number
           updated_at?: string | null
           updated_by?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "venta_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "usuario"
+            referencedColumns: ["id_supabase"]
+          },
+          {
+            foreignKeyName: "venta_estado_fkey"
+            columns: ["estado"]
+            isOneToOne: false
+            referencedRelation: "cat_estados_venta"
+            referencedColumns: ["codigo"]
+          },
           {
             foreignKeyName: "venta_id_punto_venta_fkey"
             columns: ["id_punto_venta"]
             isOneToOne: false
             referencedRelation: "punto_venta"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "venta_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "usuario"
+            referencedColumns: ["id_supabase"]
           },
         ]
       }
@@ -794,10 +1703,10 @@ export type Database = {
           estado: string | null
           ganancia_pv: number | null
           id: number
-          id_certificado: number | null
-          id_venta: number | null
+          id_certificado: number
+          id_venta: number
           monto_fijo_proveedor: number | null
-          precio_venta: number | null
+          precio_venta: number
           updated_at: string | null
           updated_by: string | null
         }
@@ -808,10 +1717,10 @@ export type Database = {
           estado?: string | null
           ganancia_pv?: number | null
           id?: number
-          id_certificado?: number | null
-          id_venta?: number | null
+          id_certificado: number
+          id_venta: number
           monto_fijo_proveedor?: number | null
-          precio_venta?: number | null
+          precio_venta: number
           updated_at?: string | null
           updated_by?: string | null
         }
@@ -822,18 +1731,25 @@ export type Database = {
           estado?: string | null
           ganancia_pv?: number | null
           id?: number
-          id_certificado?: number | null
-          id_venta?: number | null
+          id_certificado?: number
+          id_venta?: number
           monto_fijo_proveedor?: number | null
-          precio_venta?: number | null
+          precio_venta?: number
           updated_at?: string | null
           updated_by?: string | null
         }
         Relationships: [
           {
+            foreignKeyName: "venta_certificado_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "usuario"
+            referencedColumns: ["id_supabase"]
+          },
+          {
             foreignKeyName: "venta_certificado_id_certificado_fkey"
             columns: ["id_certificado"]
-            isOneToOne: false
+            isOneToOne: true
             referencedRelation: "certificado"
             referencedColumns: ["id"]
           },
@@ -844,6 +1760,13 @@ export type Database = {
             referencedRelation: "venta"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "venta_certificado_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "usuario"
+            referencedColumns: ["id_supabase"]
+          },
         ]
       }
       visita: {
@@ -851,7 +1774,8 @@ export type Database = {
           created_at: string | null
           created_by: string | null
           estado: string | null
-          fecha: string | null
+          fecha_programada: string | null
+          fecha_realizada: string | null
           id: number
           id_distribuidor: number | null
           id_proveedor: number | null
@@ -865,7 +1789,8 @@ export type Database = {
           created_at?: string | null
           created_by?: string | null
           estado?: string | null
-          fecha?: string | null
+          fecha_programada?: string | null
+          fecha_realizada?: string | null
           id?: number
           id_distribuidor?: number | null
           id_proveedor?: number | null
@@ -879,7 +1804,8 @@ export type Database = {
           created_at?: string | null
           created_by?: string | null
           estado?: string | null
-          fecha?: string | null
+          fecha_programada?: string | null
+          fecha_realizada?: string | null
           id?: number
           id_distribuidor?: number | null
           id_proveedor?: number | null
@@ -890,6 +1816,20 @@ export type Database = {
           updated_by?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "visita_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "usuario"
+            referencedColumns: ["id_supabase"]
+          },
+          {
+            foreignKeyName: "visita_estado_fkey"
+            columns: ["estado"]
+            isOneToOne: false
+            referencedRelation: "cat_estados_visita"
+            referencedColumns: ["codigo"]
+          },
           {
             foreignKeyName: "visita_id_distribuidor_fkey"
             columns: ["id_distribuidor"]
@@ -911,6 +1851,20 @@ export type Database = {
             referencedRelation: "punto_venta"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "visita_motivo_fkey"
+            columns: ["motivo"]
+            isOneToOne: false
+            referencedRelation: "cat_motivos_visita"
+            referencedColumns: ["codigo"]
+          },
+          {
+            foreignKeyName: "visita_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "usuario"
+            referencedColumns: ["id_supabase"]
+          },
         ]
       }
       zona: {
@@ -920,8 +1874,8 @@ export type Database = {
           descripcion: string | null
           estado: string | null
           id: number
-          id_proveedor: number | null
-          nombre: string | null
+          id_proveedor: number
+          nombre: string
           updated_at: string | null
           updated_by: string | null
         }
@@ -931,8 +1885,8 @@ export type Database = {
           descripcion?: string | null
           estado?: string | null
           id?: number
-          id_proveedor?: number | null
-          nombre?: string | null
+          id_proveedor: number
+          nombre: string
           updated_at?: string | null
           updated_by?: string | null
         }
@@ -942,18 +1896,39 @@ export type Database = {
           descripcion?: string | null
           estado?: string | null
           id?: number
-          id_proveedor?: number | null
-          nombre?: string | null
+          id_proveedor?: number
+          nombre?: string
           updated_at?: string | null
           updated_by?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "zona_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "usuario"
+            referencedColumns: ["id_supabase"]
+          },
+          {
+            foreignKeyName: "zona_estado_fkey"
+            columns: ["estado"]
+            isOneToOne: false
+            referencedRelation: "cat_estados_entidad"
+            referencedColumns: ["codigo"]
+          },
           {
             foreignKeyName: "zona_id_proveedor_fkey"
             columns: ["id_proveedor"]
             isOneToOne: false
             referencedRelation: "proveedor"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "zona_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "usuario"
+            referencedColumns: ["id_supabase"]
           },
         ]
       }
@@ -963,9 +1938,10 @@ export type Database = {
           created_by: string | null
           estado: string | null
           fecha_asignacion: string | null
+          fecha_desasignacion: string | null
           id: number
-          id_punto_venta: number | null
-          id_zona: number | null
+          id_punto_venta: number
+          id_zona: number
           updated_at: string | null
           updated_by: string | null
         }
@@ -974,9 +1950,10 @@ export type Database = {
           created_by?: string | null
           estado?: string | null
           fecha_asignacion?: string | null
+          fecha_desasignacion?: string | null
           id?: number
-          id_punto_venta?: number | null
-          id_zona?: number | null
+          id_punto_venta: number
+          id_zona: number
           updated_at?: string | null
           updated_by?: string | null
         }
@@ -985,13 +1962,21 @@ export type Database = {
           created_by?: string | null
           estado?: string | null
           fecha_asignacion?: string | null
+          fecha_desasignacion?: string | null
           id?: number
-          id_punto_venta?: number | null
-          id_zona?: number | null
+          id_punto_venta?: number
+          id_zona?: number
           updated_at?: string | null
           updated_by?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "zona_punto_venta_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "usuario"
+            referencedColumns: ["id_supabase"]
+          },
           {
             foreignKeyName: "zona_punto_venta_id_punto_venta_fkey"
             columns: ["id_punto_venta"]
@@ -1005,6 +1990,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "zona"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "zona_punto_venta_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "usuario"
+            referencedColumns: ["id_supabase"]
           },
         ]
       }

@@ -1,0 +1,628 @@
+{
+    "info": {
+        "_postman_id": "punto-venta-crud-simple",
+        "name": "Punto de Venta CRUD - MultiSoat",
+        "description": "Colección de pruebas para el CRUD simplificado de puntos de venta sin autenticación",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "https://wtaqmoxytfnxsggxqdhx.supabase.co/functions/v1/punto_venta"
+        }
+    ],
+    "item": [
+        {
+            "name": "01 - Crear Punto de Venta",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"tipo_documento\": \"RUC\",\n  \"numero_documento\": \"2012345{{$randomBankAccount}}\",\n  \"nombre\": \"PV {{$randomCompanyName}}\",\n  \"email\": \"pv{{$randomBankAccount}}@empresa.com\",\n  \"telefono\": \"987654321\",\n  \"direccion\": \"Av. Comercio {{$randomInt}} - Lima\",\n  \"id_externo_db_data\": {{$randomInt}}\n}"
+                },
+                "url": {
+                    "raw": "{{base_url}}",
+                    "host": [
+                        "{{base_url}}"
+                    ]
+                }
+            },
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test('Status code is 201', function () {",
+                            "    pm.response.to.have.status(201);",
+                            "});",
+                            "",
+                            "pm.test('Punto de venta created successfully', function () {",
+                            "    const response = pm.response.json();",
+                            "    pm.expect(response.success).to.be.true;",
+                            "    pm.expect(response.data).to.exist;",
+                            "    pm.expect(response.data.data.id).to.exist;",
+                            "    pm.expect(response.data.message).to.include('exitosamente');",
+                            "    ",
+                            "    // Guardar el ID para siguientes requests",
+                            "    pm.collectionVariables.set('punto_venta_id', response.data.data.id);",
+                            "    pm.collectionVariables.set('punto_venta_email', response.data.data.email);",
+                            "    pm.collectionVariables.set('punto_venta_nombre', response.data.data.nombre);",
+                            "    pm.collectionVariables.set('punto_venta_documento', response.data.data.numero_documento);",
+                            "});",
+                            "",
+                            "pm.test('Response has required fields', function () {",
+                            "    const response = pm.response.json();",
+                            "    pm.expect(response.data.data.tipo_documento).to.exist;",
+                            "    pm.expect(response.data.data.numero_documento).to.exist;",
+                            "    pm.expect(response.data.data.nombre).to.exist;",
+                            "    pm.expect(response.data.data.email).to.exist;",
+                            "    pm.expect(response.data.data.estado).to.exist;",
+                            "});"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "02 - Obtener Punto de Venta por ID",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{base_url}}/{{punto_venta_id}}",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "{{punto_venta_id}}"
+                    ]
+                }
+            },
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test('Status code is 200', function () {",
+                            "    pm.response.to.have.status(200);",
+                            "});",
+                            "",
+                            "pm.test('Punto de venta found successfully', function () {",
+                            "    const response = pm.response.json();",
+                            "    pm.expect(response.success).to.be.true;",
+                            "    pm.expect(response.data).to.exist;",
+                            "    pm.expect(response.data.id).to.equal(parseInt(pm.collectionVariables.get('punto_venta_id')));",
+                            "    pm.expect(response.message).to.include('encontrado');",
+                            "});",
+                            "",
+                            "pm.test('Data integrity check', function () {",
+                            "    const response = pm.response.json();",
+                            "    pm.expect(response.data.email).to.equal(pm.collectionVariables.get('punto_venta_email'));",
+                            "    pm.expect(response.data.nombre).to.equal(pm.collectionVariables.get('punto_venta_nombre'));",
+                            "    pm.expect(response.data.numero_documento).to.equal(pm.collectionVariables.get('punto_venta_documento'));",
+                            "});"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "03 - Listar Todos los Puntos de Venta",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{base_url}}",
+                    "host": [
+                        "{{base_url}}"
+                    ]
+                }
+            },
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test('Status code is 200', function () {",
+                            "    pm.response.to.have.status(200);",
+                            "});",
+                            "",
+                            "pm.test('Puntos de venta list returned', function () {",
+                            "    const response = pm.response.json();",
+                            "    pm.expect(response.success).to.be.true;",
+                            "    pm.expect(response.data).to.be.an('array');",
+                            "    pm.expect(response.pagination).to.exist;",
+                            "});",
+                            "",
+                            "pm.test('Pagination data is correct', function () {",
+                            "    const response = pm.response.json();",
+                            "    pm.expect(response.pagination.page).to.exist;",
+                            "    pm.expect(response.pagination.limit).to.exist;",
+                            "    pm.expect(response.pagination.total).to.exist;",
+                            "    pm.expect(response.pagination.totalPages).to.exist;",
+                            "});"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "04 - Listar Puntos de Venta con Paginación",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{base_url}}?page=1&limit=5",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "query": [
+                        {
+                            "key": "page",
+                            "value": "1"
+                        },
+                        {
+                            "key": "limit",
+                            "value": "5"
+                        }
+                    ]
+                }
+            },
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test('Status code is 200', function () {",
+                            "    pm.response.to.have.status(200);",
+                            "});",
+                            "",
+                            "pm.test('Pagination parameters respected', function () {",
+                            "    const response = pm.response.json();",
+                            "    pm.expect(response.pagination.page).to.equal(1);",
+                            "    pm.expect(response.pagination.limit).to.equal(5);",
+                            "    pm.expect(response.data.length).to.be.at.most(5);",
+                            "});"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "05 - Actualizar Punto de Venta",
+            "request": {
+                "method": "PUT",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"nombre\": \"{{$randomCompanyName}} - ACTUALIZADO\",\n  \"telefono\": \"956789{{$randomInt}}\",\n  \"direccion\": \"Av. Actualizada {{$randomInt}} - Lima\",\n  \"id_externo_db_data\": {{$randomInt}}\n}"
+                },
+                "url": {
+                    "raw": "{{base_url}}/{{punto_venta_id}}",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "{{punto_venta_id}}"
+                    ]
+                }
+            },
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test('Status code is 200', function () {",
+                            "    pm.response.to.have.status(200);",
+                            "});",
+                            "",
+                            "pm.test('Punto de venta updated successfully', function () {",
+                            "    const response = pm.response.json();",
+                            "    pm.expect(response.success).to.be.true;",
+                            "    pm.expect(response.data).to.exist;",
+                            "    pm.expect(response.message).to.include('actualizado');",
+                            "});",
+                            "",
+                            "pm.test('Updated fields are correct', function () {",
+                            "    const response = pm.response.json();",
+                            "    pm.expect(response.data.nombre).to.include('ACTUALIZADO');",
+                            "    pm.expect(response.data.direccion).to.include('Actualizada');",
+                            "});"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "06 - Eliminar Punto de Venta (Soft Delete)",
+            "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                    "raw": "{{base_url}}/{{punto_venta_id}}",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "{{punto_venta_id}}"
+                    ]
+                }
+            },
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test('Status code is 200', function () {",
+                            "    pm.response.to.have.status(200);",
+                            "});",
+                            "",
+                            "pm.test('Punto de venta deleted successfully', function () {",
+                            "    const response = pm.response.json();",
+                            "    pm.expect(response.success).to.be.true;",
+                            "    pm.expect(response.data).to.exist;",
+                            "    pm.expect(response.message).to.include('eliminado');",
+                            "});",
+                            "",
+                            "pm.test('Estado changed to INACTIVO', function () {",
+                            "    const response = pm.response.json();",
+                            "    pm.expect(response.data.estado).to.equal('INACTIVO');",
+                            "});"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "07 - Error: Punto de Venta No Encontrado",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{base_url}}/99999",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "99999"
+                    ]
+                }
+            },
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test('Status code is 404', function () {",
+                            "    pm.response.to.have.status(404);",
+                            "});",
+                            "",
+                            "pm.test('Error message is correct', function () {",
+                            "    const response = pm.response.json();",
+                            "    pm.expect(response.success).to.be.false;",
+                            "    pm.expect(response.error).to.include('no encontrado');",
+                            "});"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "08 - Error: Crear Punto de Venta sin Datos Requeridos",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"nombre\": \"Punto de Venta Sin Documento\"\n}"
+                },
+                "url": {
+                    "raw": "{{base_url}}",
+                    "host": [
+                        "{{base_url}}"
+                    ]
+                }
+            },
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test('Status code is 400', function () {",
+                            "    pm.response.to.have.status(400);",
+                            "});",
+                            "",
+                            "pm.test('Error message mentions required fields', function () {",
+                            "    const response = pm.response.json();",
+                            "    pm.expect(response.success).to.be.false;",
+                            "    pm.expect(response.error).to.include('requeridos');",
+                            "});"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "09 - Error: Crear Punto de Venta con Tipo Documento Inválido",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"tipo_documento\": \"INVALID\",\n  \"numero_documento\": \"12345678901\",\n  \"nombre\": \"Punto de Venta Test\",\n  \"email\": \"test@invalid.com\"\n}"
+                },
+                "url": {
+                    "raw": "{{base_url}}",
+                    "host": [
+                        "{{base_url}}"
+                    ]
+                }
+            },
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test('Status code is 400', function () {",
+                            "    pm.response.to.have.status(400);",
+                            "});",
+                            "",
+                            "pm.test('Error message mentions invalid document type', function () {",
+                            "    const response = pm.response.json();",
+                            "    pm.expect(response.success).to.be.false;",
+                            "    pm.expect(response.error).to.include('no es válido');",
+                            "});"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "10 - Error: Crear Punto de Venta con Documento Duplicado",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"tipo_documento\": \"RUC\",\n  \"numero_documento\": \"20111222333\",\n  \"nombre\": \"Punto de Venta Duplicado\",\n  \"email\": \"duplicate@test.com\"\n}"
+                },
+                "url": {
+                    "raw": "{{base_url}}",
+                    "host": [
+                        "{{base_url}}"
+                    ]
+                }
+            },
+            "event": [
+                {
+                    "listen": "prerequest",
+                    "script": {
+                        "exec": [
+                            "// Primero crear el punto de venta original",
+                            "pm.sendRequest({",
+                            "    url: pm.collectionVariables.get('base_url'),",
+                            "    method: 'POST',",
+                            "    header: {",
+                            "        'Content-Type': 'application/json'",
+                            "    },",
+                            "    body: {",
+                            "        mode: 'raw',",
+                            "        raw: JSON.stringify({",
+                            "            tipo_documento: 'RUC',",
+                            "            numero_documento: '20111222333',",
+                            "            nombre: 'Punto de Venta Original',",
+                            "            email: 'original@test.com'",
+                            "        })",
+                            "    }",
+                            "}, function(err, response) {",
+                            "    if (response) {",
+                            "        const responseJson = response.json();",
+                            "        if (responseJson.success) {",
+                            "            pm.collectionVariables.set('duplicate_test_id', responseJson.data.data.id);",
+                            "        }",
+                            "    }",
+                            "});"
+                        ],
+                        "type": "text/javascript"
+                    }
+                },
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test('Status code is 400', function () {",
+                            "    pm.response.to.have.status(400);",
+                            "});",
+                            "",
+                            "pm.test('Error message mentions duplicate document', function () {",
+                            "    const response = pm.response.json();",
+                            "    pm.expect(response.success).to.be.false;",
+                            "    pm.expect(response.error).to.include('Ya existe');",
+                            "});"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "11 - Error: Crear Punto de Venta con Email Duplicado",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"tipo_documento\": \"RUC\",\n  \"numero_documento\": \"20444555666\",\n  \"nombre\": \"Punto de Venta Email Duplicado\",\n  \"email\": \"duplicate.email@test.com\"\n}"
+                },
+                "url": {
+                    "raw": "{{base_url}}",
+                    "host": [
+                        "{{base_url}}"
+                    ]
+                }
+            },
+            "event": [
+                {
+                    "listen": "prerequest",
+                    "script": {
+                        "exec": [
+                            "// Primero crear el punto de venta con el email",
+                            "pm.sendRequest({",
+                            "    url: pm.collectionVariables.get('base_url'),",
+                            "    method: 'POST',",
+                            "    header: {",
+                            "        'Content-Type': 'application/json'",
+                            "    },",
+                            "    body: {",
+                            "        mode: 'raw',",
+                            "        raw: JSON.stringify({",
+                            "            tipo_documento: 'RUC',",
+                            "            numero_documento: '20777888999',",
+                            "            nombre: 'Punto de Venta Email Original',",
+                            "            email: 'duplicate.email@test.com'",
+                            "        })",
+                            "    }",
+                            "}, function(err, response) {",
+                            "    if (response) {",
+                            "        const responseJson = response.json();",
+                            "        if (responseJson.success) {",
+                            "            pm.collectionVariables.set('duplicate_email_test_id', responseJson.data.data.id);",
+                            "        }",
+                            "    }",
+                            "});"
+                        ],
+                        "type": "text/javascript"
+                    }
+                },
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test('Status code is 400', function () {",
+                            "    pm.response.to.have.status(400);",
+                            "});",
+                            "",
+                            "pm.test('Error message mentions duplicate email', function () {",
+                            "    const response = pm.response.json();",
+                            "    pm.expect(response.success).to.be.false;",
+                            "    pm.expect(response.error).to.include('Ya existe');",
+                            "    pm.expect(response.error).to.include('email');",
+                            "});"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "12 - Crear Punto de Venta con DNI",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"tipo_documento\": \"DNI\",\n  \"numero_documento\": \"{{$randomBankAccount}}\",\n  \"nombre\": \"{{$randomFirstName}} {{$randomLastName}}\",\n  \"email\": \"dni{{$randomBankAccount}}@empresa.com\",\n  \"telefono\": \"987654321\",\n  \"direccion\": \"Jr. Los Olivos {{$randomInt}} - Lima\"\n}"
+                },
+                "url": {
+                    "raw": "{{base_url}}",
+                    "host": [
+                        "{{base_url}}"
+                    ]
+                }
+            },
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test('Status code is 201', function () {",
+                            "    pm.response.to.have.status(201);",
+                            "});",
+                            "",
+                            "pm.test('DNI punto de venta created successfully', function () {",
+                            "    const response = pm.response.json();",
+                            "    pm.expect(response.success).to.be.true;",
+                            "    pm.expect(response.data.data.tipo_documento).to.equal('DNI');",
+                            "    pm.expect(response.data.data.numero_documento).to.exist;",
+                            "});"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ]
+        }
+    ],
+    "event": [
+        {
+            "listen": "prerequest",
+            "script": {
+                "type": "text/javascript",
+                "exec": [
+                    "// Pre-request script global",
+                    "console.log('🚀 Ejecutando prueba de Punto de Venta CRUD');"
+                ]
+            }
+        },
+        {
+            "listen": "test",
+            "script": {
+                "type": "text/javascript",
+                "exec": [
+                    "// Test script global",
+                    "pm.test('Response time is reasonable', function () {",
+                    "    pm.expect(pm.response.responseTime).to.be.below(3000);",
+                    "});",
+                    "",
+                    "pm.test('Content-Type is JSON', function () {",
+                    "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                    "});"
+                ]
+            }
+        }
+    ]
+}

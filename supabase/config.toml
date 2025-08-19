@@ -360,6 +360,12 @@ verify_jwt = false
 import_map = "./functions/distribuidor/deno.json"
 entrypoint = "./functions/distribuidor/index.ts"
 
+[functions.punto_venta]
+enabled = true
+verify_jwt = false
+import_map = "./functions/punto_venta/deno.json"
+entrypoint = "./functions/punto_venta/index.ts"
+
 [functions.auth]
 enabled = true
 verify_jwt = false

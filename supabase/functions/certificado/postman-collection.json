@@ -1,0 +1,610 @@
+{
+    "info": {
+        "_postman_id": "certificado-id-12345",
+        "name": "MultiSoat Certificado API - Complete CRUD",
+        "description": "Complete CRUD operations for certificate management with provider validation and complete sale workflow\n\nBase URL: https://wtaqmoxytfnxsggxqdhx.supabase.co/functions/v1/certificado\n\nBusiness Logic:\n- Certificates are created WITHOUT category initially\n- Complete sale process (Step 11, 11.5, 11.6) assigns: category, VENDIDO status, photo URL, and vehicle data\n- Certificates start with DISPONIBLE status\n- Only required fields at creation: id_proveedor, numero_serie\n\nSale Workflow Examples:\n- Step 11: Taxi sale with TAXI_M1_AUTO category\n- Step 11.5: Mototaxi sale with PUB_L5_MOTOTAXI category  \n- Step 11.6: Urban bus sale with URB_M3_OMNIBUS category\n\nFeatures:\n- CREATE: Register new certificates for providers (no category required)\n- READ: Get all certificates with pagination and filtering\n- UPDATE: Complete sale workflow with category, photo, and vehicle data assignment\n- DELETE: Soft delete (sets estado to ANULADO)\n- Provider validation and optional category validation\n- Unique numero_serie constraint\n- State transition controls\n- Filtering by proveedor_id, estado, categoria, numero_serie",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "1. CREATE Certificado",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"id_proveedor\": 4,\n  \"numero_serie\": \"CERT-001-2024\",\n  \"foto_url\": \"https://example.com/photos/cert001.jpg\",\n  \"datos_vehiculo_externo\": \"VEH-12345\",\n  \"estado\": \"DISPONIBLE\"\n}"
+                },
+                "url": {
+                    "raw": "https://wtaqmoxytfnxsggxqdhx.supabase.co/functions/v1/certificado",
+                    "protocol": "https",
+                    "host": [
+                        "wtaqmoxytfnxsggxqdhx",
+                        "supabase",
+                        "co"
+                    ],
+                    "path": [
+                        "functions",
+                        "v1",
+                        "certificado"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "2. CREATE Certificado Minimal",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"id_proveedor\": 4,\n  \"numero_serie\": \"CERT-002-2024\"\n}"
+                },
+                "url": {
+                    "raw": "https://wtaqmoxytfnxsggxqdhx.supabase.co/functions/v1/certificado",
+                    "protocol": "https",
+                    "host": [
+                        "wtaqmoxytfnxsggxqdhx",
+                        "supabase",
+                        "co"
+                    ],
+                    "path": [
+                        "functions",
+                        "v1",
+                        "certificado"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "3. CREATE Certificado Público",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"id_proveedor\": 4,\n  \"numero_serie\": \"CERT-PUB-001-2024\",\n  \"datos_vehiculo_externo\": \"MOTO-9876\"\n}"
+                },
+                "url": {
+                    "raw": "https://wtaqmoxytfnxsggxqdhx.supabase.co/functions/v1/certificado",
+                    "protocol": "https",
+                    "host": [
+                        "wtaqmoxytfnxsggxqdhx",
+                        "supabase",
+                        "co"
+                    ],
+                    "path": [
+                        "functions",
+                        "v1",
+                        "certificado"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "4. GET All Certificados",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "https://wtaqmoxytfnxsggxqdhx.supabase.co/functions/v1/certificado",
+                    "protocol": "https",
+                    "host": [
+                        "wtaqmoxytfnxsggxqdhx",
+                        "supabase",
+                        "co"
+                    ],
+                    "path": [
+                        "functions",
+                        "v1",
+                        "certificado"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "5. GET Certificados with Pagination",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "https://wtaqmoxytfnxsggxqdhx.supabase.co/functions/v1/certificado?page=1&limit=5",
+                    "protocol": "https",
+                    "host": [
+                        "wtaqmoxytfnxsggxqdhx",
+                        "supabase",
+                        "co"
+                    ],
+                    "path": [
+                        "functions",
+                        "v1",
+                        "certificado"
+                    ],
+                    "query": [
+                        {
+                            "key": "page",
+                            "value": "1"
+                        },
+                        {
+                            "key": "limit",
+                            "value": "5"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "name": "6. GET By Proveedor ID",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "https://wtaqmoxytfnxsggxqdhx.supabase.co/functions/v1/certificado?proveedor_id=1",
+                    "protocol": "https",
+                    "host": [
+                        "wtaqmoxytfnxsggxqdhx",
+                        "supabase",
+                        "co"
+                    ],
+                    "path": [
+                        "functions",
+                        "v1",
+                        "certificado"
+                    ],
+                    "query": [
+                        {
+                            "key": "proveedor_id",
+                            "value": "1"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "name": "7. GET By Estado",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "https://wtaqmoxytfnxsggxqdhx.supabase.co/functions/v1/certificado?estado=DISPONIBLE",
+                    "protocol": "https",
+                    "host": [
+                        "wtaqmoxytfnxsggxqdhx",
+                        "supabase",
+                        "co"
+                    ],
+                    "path": [
+                        "functions",
+                        "v1",
+                        "certificado"
+                    ],
+                    "query": [
+                        {
+                            "key": "estado",
+                            "value": "DISPONIBLE"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "name": "8. GET By Categoria",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "https://wtaqmoxytfnxsggxqdhx.supabase.co/functions/v1/certificado?categoria=TAXI_M1_AUTO",
+                    "protocol": "https",
+                    "host": [
+                        "wtaqmoxytfnxsggxqdhx",
+                        "supabase",
+                        "co"
+                    ],
+                    "path": [
+                        "functions",
+                        "v1",
+                        "certificado"
+                    ],
+                    "query": [
+                        {
+                            "key": "categoria",
+                            "value": "TAXI_M1_AUTO"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "name": "9. SEARCH By Numero Serie",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "https://wtaqmoxytfnxsggxqdhx.supabase.co/functions/v1/certificado?numero_serie=CERT-001",
+                    "protocol": "https",
+                    "host": [
+                        "wtaqmoxytfnxsggxqdhx",
+                        "supabase",
+                        "co"
+                    ],
+                    "path": [
+                        "functions",
+                        "v1",
+                        "certificado"
+                    ],
+                    "query": [
+                        {
+                            "key": "numero_serie",
+                            "value": "CERT-001"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "name": "10. GET Single Certificado by ID",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "https://wtaqmoxytfnxsggxqdhx.supabase.co/functions/v1/certificado/1",
+                    "protocol": "https",
+                    "host": [
+                        "wtaqmoxytfnxsggxqdhx",
+                        "supabase",
+                        "co"
+                    ],
+                    "path": [
+                        "functions",
+                        "v1",
+                        "certificado",
+                        "1"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "11. COMPLETE SALE - Assign Category, Photo and Vehicle Data",
+            "request": {
+                "method": "PUT",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"categoria\": \"TAXI_M1_AUTO\",\n  \"estado\": \"VENDIDO\",\n  \"foto_url\": \"https://example.com/photos/taxi-abc123-sold.jpg\",\n  \"datos_vehiculo_externo\": \"PLACA: ABC-123, MODELO: Toyota Yaris 2020, MOTOR: 1KR-FE\"\n}"
+                },
+                "url": {
+                    "raw": "https://wtaqmoxytfnxsggxqdhx.supabase.co/functions/v1/certificado/1",
+                    "protocol": "https",
+                    "host": [
+                        "wtaqmoxytfnxsggxqdhx",
+                        "supabase",
+                        "co"
+                    ],
+                    "path": [
+                        "functions",
+                        "v1",
+                        "certificado",
+                        "1"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "11.5. COMPLETE SALE - Mototaxi",
+            "request": {
+                "method": "PUT",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"categoria\": \"PUB_L5_MOTOTAXI\",\n  \"estado\": \"VENDIDO\",\n  \"foto_url\": \"https://example.com/photos/mototaxi-xyz789-sold.jpg\",\n  \"datos_vehiculo_externo\": \"PLACA: XYZ-789, MARCA: Bajaj, MODELO: RE205, AÑO: 2023\"\n}"
+                },
+                "url": {
+                    "raw": "https://wtaqmoxytfnxsggxqdhx.supabase.co/functions/v1/certificado/2",
+                    "protocol": "https",
+                    "host": [
+                        "wtaqmoxytfnxsggxqdhx",
+                        "supabase",
+                        "co"
+                    ],
+                    "path": [
+                        "functions",
+                        "v1",
+                        "certificado",
+                        "2"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "11.6. COMPLETE SALE - Omnibus Urbano",
+            "request": {
+                "method": "PUT",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"categoria\": \"URB_M3_OMNIBUS\",\n  \"estado\": \"VENDIDO\",\n  \"foto_url\": \"https://example.com/photos/bus-def456-sold.jpg\",\n  \"datos_vehiculo_externo\": \"PLACA: DEF-456, MARCA: Volvo, MODELO: B290R, CAPACIDAD: 90 pasajeros, RUTA: Línea 203\"\n}"
+                },
+                "url": {
+                    "raw": "https://wtaqmoxytfnxsggxqdhx.supabase.co/functions/v1/certificado/3",
+                    "protocol": "https",
+                    "host": [
+                        "wtaqmoxytfnxsggxqdhx",
+                        "supabase",
+                        "co"
+                    ],
+                    "path": [
+                        "functions",
+                        "v1",
+                        "certificado",
+                        "3"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "12. UPDATE Estado to ASIGNADO_DIST (Assignment Only)",
+            "request": {
+                "method": "PUT",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"estado\": \"ASIGNADO_DIST\"\n}"
+                },
+                "url": {
+                    "raw": "https://wtaqmoxytfnxsggxqdhx.supabase.co/functions/v1/certificado/1",
+                    "protocol": "https",
+                    "host": [
+                        "wtaqmoxytfnxsggxqdhx",
+                        "supabase",
+                        "co"
+                    ],
+                    "path": [
+                        "functions",
+                        "v1",
+                        "certificado",
+                        "1"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "13. UPDATE Estado to ASIGNADO_PV (Assignment Only)",
+            "request": {
+                "method": "PUT",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"estado\": \"ASIGNADO_PV\"\n}"
+                },
+                "url": {
+                    "raw": "https://wtaqmoxytfnxsggxqdhx.supabase.co/functions/v1/certificado/2",
+                    "protocol": "https",
+                    "host": [
+                        "wtaqmoxytfnxsggxqdhx",
+                        "supabase",
+                        "co"
+                    ],
+                    "path": [
+                        "functions",
+                        "v1",
+                        "certificado",
+                        "2"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "14. DELETE Certificado (Soft Delete)",
+            "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                    "raw": "https://wtaqmoxytfnxsggxqdhx.supabase.co/functions/v1/certificado/2",
+                    "protocol": "https",
+                    "host": [
+                        "wtaqmoxytfnxsggxqdhx",
+                        "supabase",
+                        "co"
+                    ],
+                    "path": [
+                        "functions",
+                        "v1",
+                        "certificado",
+                        "2"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "15. CREATE Multiple Test Data",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"id_proveedor\": 4,\n  \"numero_serie\": \"CERT-BATCH-001-2024\",\n  \"datos_vehiculo_externo\": \"BUS-5566\"\n}"
+                },
+                "url": {
+                    "raw": "https://wtaqmoxytfnxsggxqdhx.supabase.co/functions/v1/certificado",
+                    "protocol": "https",
+                    "host": [
+                        "wtaqmoxytfnxsggxqdhx",
+                        "supabase",
+                        "co"
+                    ],
+                    "path": [
+                        "functions",
+                        "v1",
+                        "certificado"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "16. Error Test - Invalid Proveedor",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"id_proveedor\": 4,\n  \"numero_serie\": \"CERT-ERROR-001\"\n}"
+                },
+                "url": {
+                    "raw": "https://wtaqmoxytfnxsggxqdhx.supabase.co/functions/v1/certificado",
+                    "protocol": "https",
+                    "host": [
+                        "wtaqmoxytfnxsggxqdhx",
+                        "supabase",
+                        "co"
+                    ],
+                    "path": [
+                        "functions",
+                        "v1",
+                        "certificado"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "17. Error Test - Duplicate Numero Serie",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"id_proveedor\": 4,\n  \"numero_serie\": \"CERT-001-2024\"\n}"
+                },
+                "url": {
+                    "raw": "https://wtaqmoxytfnxsggxqdhx.supabase.co/functions/v1/certificado",
+                    "protocol": "https",
+                    "host": [
+                        "wtaqmoxytfnxsggxqdhx",
+                        "supabase",
+                        "co"
+                    ],
+                    "path": [
+                        "functions",
+                        "v1",
+                        "certificado"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "18. Error Test - Invalid Categoria",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"id_proveedor\": 4,\n  \"numero_serie\": \"CERT-ERROR-002\",\n  \"categoria\": \"INVALID_CATEGORIA\"\n}"
+                },
+                "url": {
+                    "raw": "https://wtaqmoxytfnxsggxqdhx.supabase.co/functions/v1/certificado",
+                    "protocol": "https",
+                    "host": [
+                        "wtaqmoxytfnxsggxqdhx",
+                        "supabase",
+                        "co"
+                    ],
+                    "path": [
+                        "functions",
+                        "v1",
+                        "certificado"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "19. Error Test - Update Sold Certificate",
+            "request": {
+                "method": "PUT",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"estado\": \"DISPONIBLE\"\n}"
+                },
+                "url": {
+                    "raw": "https://wtaqmoxytfnxsggxqdhx.supabase.co/functions/v1/certificado/3",
+                    "protocol": "https",
+                    "host": [
+                        "wtaqmoxytfnxsggxqdhx",
+                        "supabase",
+                        "co"
+                    ],
+                    "path": [
+                        "functions",
+                        "v1",
+                        "certificado",
+                        "3"
+                    ]
+                }
+            }
+        }
+    ]
+}

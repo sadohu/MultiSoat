@@ -1,0 +1,504 @@
+{
+    "info": {
+        "name": "MultiSoat - Asignación Certificados CRUD Clásico",
+        "description": "CRUD clásico para asignaciones de certificados - crear, leer, actualizar, eliminar",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "variable": [
+        {
+            "key": "baseUrl",
+            "value": "https://wtaqmoxytfnxsggxqdhx.supabase.co/functions/v1/asignacion",
+            "type": "string"
+        }
+    ],
+    "item": [
+        {
+            "name": "Listar Asignaciones",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{baseUrl}}",
+                    "host": [
+                        "{{baseUrl}}"
+                    ]
+                },
+                "description": "Obtiene todas las asignaciones de certificados con paginación"
+            }
+        },
+        {
+            "name": "Listar Asignaciones con Paginación",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{baseUrl}}?page=1&limit=5",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "query": [
+                        {
+                            "key": "page",
+                            "value": "1"
+                        },
+                        {
+                            "key": "limit",
+                            "value": "5"
+                        }
+                    ]
+                },
+                "description": "Obtiene asignaciones con paginación personalizada"
+            }
+        },
+        {
+            "name": "Filtrar por Certificado",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{baseUrl}}?certificado_id=1",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "query": [
+                        {
+                            "key": "certificado_id",
+                            "value": "1"
+                        }
+                    ]
+                },
+                "description": "Obtiene asignaciones filtradas por certificado específico"
+            }
+        },
+        {
+            "name": "Filtrar por Distribuidor",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{baseUrl}}?distribuidor_id=1",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "query": [
+                        {
+                            "key": "distribuidor_id",
+                            "value": "1"
+                        }
+                    ]
+                },
+                "description": "Obtiene asignaciones filtradas por distribuidor específico"
+            }
+        },
+        {
+            "name": "Filtrar por Punto de Venta",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{baseUrl}}?punto_venta_id=1",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "query": [
+                        {
+                            "key": "punto_venta_id",
+                            "value": "1"
+                        }
+                    ]
+                },
+                "description": "Obtiene asignaciones filtradas por punto de venta específico"
+            }
+        },
+        {
+            "name": "Filtrar por Tipo de Asignación",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{baseUrl}}?tipo_asignacion=distribuidor",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "query": [
+                        {
+                            "key": "tipo_asignacion",
+                            "value": "distribuidor"
+                        }
+                    ]
+                },
+                "description": "Obtiene asignaciones filtradas por tipo (distribuidor o punto_venta)"
+            }
+        },
+        {
+            "name": "Filtrar por Estado",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{baseUrl}}?estado=activo",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "query": [
+                        {
+                            "key": "estado",
+                            "value": "activo"
+                        }
+                    ]
+                },
+                "description": "Obtiene asignaciones filtradas por estado (activo/inactivo)"
+            }
+        },
+        {
+            "name": "Obtener Asignación por ID",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{baseUrl}}/1",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "1"
+                    ]
+                },
+                "description": "Obtiene una asignación específica por su ID"
+            }
+        },
+        {
+            "name": "Crear Asignación a Distribuidor",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"id_certificado\": 1,\n  \"id_distribuidor\": 1,\n  \"id_punto_venta\": null,\n  \"tipo_asignacion\": \"distribuidor\"\n}"
+                },
+                "url": {
+                    "raw": "{{baseUrl}}",
+                    "host": [
+                        "{{baseUrl}}"
+                    ]
+                },
+                "description": "Crear asignación con campos opcionales que pueden ser null"
+            }
+        },
+        {
+            "name": "Crear Asignación a Punto de Venta",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"id_certificado\": 2,\n  \"id_distribuidor\": null,\n  \"id_punto_venta\": 1,\n  \"tipo_asignacion\": \"punto_venta\"\n}"
+                },
+                "url": {
+                    "raw": "{{baseUrl}}",
+                    "host": [
+                        "{{baseUrl}}"
+                    ]
+                },
+                "description": "Crea una nueva asignación de certificado a un punto de venta"
+            }
+        },
+        {
+            "name": "Actualizar Asignación Completa",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"id_punto_venta\": 1,\n  \"estado\": \"activo\"\n}"
+                },
+                "url": {
+                    "raw": "{{baseUrl}}",
+                    "host": [
+                        "{{baseUrl}}"
+                    ]
+                },
+                "description": "Actualizar asignación agregando punto de venta (PUT clásico)"
+            }
+        },
+        {
+            "name": "Actualizar Estado de Asignación",
+            "request": {
+                "method": "PUT",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"estado\": \"inactivo\"\n}"
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/1",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "1"
+                    ]
+                },
+                "description": "Actualiza el estado de una asignación existente"
+            }
+        },
+        {
+            "name": "Actualizar Usuario Asignación",
+            "request": {
+                "method": "PUT",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"usuario_asignacion\": null\n}"
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/1",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "1"
+                    ]
+                },
+                "description": "Actualiza el usuario responsable de una asignación"
+            }
+        },
+        {
+            "name": "Eliminar Asignación (Soft Delete)",
+            "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                    "raw": "{{baseUrl}}/1",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "1"
+                    ]
+                },
+                "description": "Eliminar físicamente la asignación (DELETE real, no soft delete)"
+            }
+        },
+        {
+            "name": "❌ Error - Crear sin Certificado",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"id_distribuidor\": 1,\n  \"tipo_asignacion\": \"distribuidor\"\n}"
+                },
+                "url": {
+                    "raw": "{{baseUrl}}",
+                    "host": [
+                        "{{baseUrl}}"
+                    ]
+                },
+                "description": "ERROR: Intenta crear asignación sin especificar certificado"
+            }
+        },
+        {
+            "name": "❌ Error - Tipo Asignación Inválido",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"id_certificado\": 1,\n  \"tipo_asignacion\": \"cliente\",\n  \"id_distribuidor\": 1\n}"
+                },
+                "url": {
+                    "raw": "{{baseUrl}}",
+                    "host": [
+                        "{{baseUrl}}"
+                    ]
+                },
+                "description": "ERROR: Tipo de asignación inválido (debe ser distribuidor o punto_venta)"
+            }
+        },
+        {
+            "name": "❌ Error - Distribuidor sin ID",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"id_certificado\": 1,\n  \"tipo_asignacion\": \"distribuidor\"\n}"
+                },
+                "url": {
+                    "raw": "{{baseUrl}}",
+                    "host": [
+                        "{{baseUrl}}"
+                    ]
+                },
+                "description": "ERROR: Tipo distribuidor sin id_distribuidor"
+            }
+        },
+        {
+            "name": "❌ Error - Punto Venta sin ID",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"id_certificado\": 1,\n  \"tipo_asignacion\": \"punto_venta\"\n}"
+                },
+                "url": {
+                    "raw": "{{baseUrl}}",
+                    "host": [
+                        "{{baseUrl}}"
+                    ]
+                },
+                "description": "ERROR: Tipo punto_venta sin id_punto_venta"
+            }
+        },
+        {
+            "name": "❌ Error - Certificado Inexistente",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"id_certificado\": 999999,\n  \"id_distribuidor\": 1,\n  \"tipo_asignacion\": \"distribuidor\"\n}"
+                },
+                "url": {
+                    "raw": "{{baseUrl}}",
+                    "host": [
+                        "{{baseUrl}}"
+                    ]
+                },
+                "description": "ERROR: Intenta asignar certificado que no existe"
+            }
+        },
+        {
+            "name": "❌ Error - Distribuidor Inexistente",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"id_certificado\": 1,\n  \"id_distribuidor\": 999999,\n  \"tipo_asignacion\": \"distribuidor\"\n}"
+                },
+                "url": {
+                    "raw": "{{baseUrl}}",
+                    "host": [
+                        "{{baseUrl}}"
+                    ]
+                },
+                "description": "ERROR: Intenta asignar a distribuidor que no existe"
+            }
+        },
+        {
+            "name": "❌ Error - Punto Venta Inexistente",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"id_certificado\": 1,\n  \"id_punto_venta\": 999999,\n  \"tipo_asignacion\": \"punto_venta\"\n}"
+                },
+                "url": {
+                    "raw": "{{baseUrl}}",
+                    "host": [
+                        "{{baseUrl}}"
+                    ]
+                },
+                "description": "ERROR: Intenta asignar a punto de venta que no existe"
+            }
+        },
+        {
+            "name": "❌ Error - ID Asignación Inválido",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{baseUrl}}/invalid-id",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "invalid-id"
+                    ]
+                },
+                "description": "ERROR: Busca asignación con ID inválido"
+            }
+        },
+        {
+            "name": "❌ Error - Asignación No Encontrada",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{baseUrl}}/999999",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "999999"
+                    ]
+                },
+                "description": "ERROR: Busca asignación que no existe"
+            }
+        }
+    ]
+}

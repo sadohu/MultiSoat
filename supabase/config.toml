@@ -378,6 +378,12 @@ verify_jwt = false
 import_map = "./functions/afiliacion/deno.json"
 entrypoint = "./functions/afiliacion/index.ts"
 
+[functions.asignacion]
+enabled = true
+verify_jwt = false
+import_map = "./functions/asignacion/deno.json"
+entrypoint = "./functions/asignacion/index.ts"
+
 [functions.auth]
 enabled = true
 verify_jwt = false

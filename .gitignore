@@ -35,5 +35,4 @@ supabase/migrations/*.sql
 
 # Ignore database dumps
 *.dump
-*.sql
 !supabase/migrations/*.sql

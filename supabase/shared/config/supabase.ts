@@ -964,7 +964,7 @@ export type Database = {
           email: string
           estado: string | null
           id: number
-          id_externo_db_data: string | null
+          id_externo_db_data: number | null
           id_proveedor: number
           nombre: string | null
           telefono: string | null
@@ -977,7 +977,7 @@ export type Database = {
           email: string
           estado?: string | null
           id?: number
-          id_externo_db_data?: string | null
+          id_externo_db_data?: number | null
           id_proveedor: number
           nombre?: string | null
           telefono?: string | null
@@ -990,7 +990,7 @@ export type Database = {
           email?: string
           estado?: string | null
           id?: number
-          id_externo_db_data?: string | null
+          id_externo_db_data?: number | null
           id_proveedor?: number
           nombre?: string | null
           telefono?: string | null
@@ -1286,7 +1286,7 @@ export type Database = {
           email: string
           estado: string | null
           id: number
-          id_externo_db_data: string | null
+          id_externo_db_data: number | null
           nombre: string | null
           numero_documento: string
           razon_social: string | null
@@ -1302,7 +1302,7 @@ export type Database = {
           email: string
           estado?: string | null
           id?: number
-          id_externo_db_data?: string | null
+          id_externo_db_data?: number | null
           nombre?: string | null
           numero_documento: string
           razon_social?: string | null
@@ -1318,7 +1318,7 @@ export type Database = {
           email?: string
           estado?: string | null
           id?: number
-          id_externo_db_data?: string | null
+          id_externo_db_data?: number | null
           nombre?: string | null
           numero_documento?: string
           razon_social?: string | null
@@ -1366,7 +1366,7 @@ export type Database = {
           email: string
           estado: string | null
           id: number
-          id_externo_db_data: string | null
+          id_externo_db_data: number | null
           nombre: string | null
           numero_documento: string
           telefono: string | null
@@ -1381,7 +1381,7 @@ export type Database = {
           email: string
           estado?: string | null
           id?: number
-          id_externo_db_data?: string | null
+          id_externo_db_data?: number | null
           nombre?: string | null
           numero_documento: string
           telefono?: string | null
@@ -1396,7 +1396,7 @@ export type Database = {
           email?: string
           estado?: string | null
           id?: number
-          id_externo_db_data?: string | null
+          id_externo_db_data?: number | null
           nombre?: string | null
           numero_documento?: string
           telefono?: string | null

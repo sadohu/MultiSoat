@@ -1,0 +1,290 @@
+{
+    "info": {
+        "name": "Venta API",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+        "description": "Endpoints para gestión de ventas en MultiSoat"
+    },
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "https://your-project.supabase.co/functions/v1/venta",
+            "type": "string"
+        }
+    ],
+    "item": [
+        {
+            "name": "Crear Venta",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    },
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{supabase_key}}"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"id_punto_venta\": 1,\n  \"precio_total\": 250000.00,\n  \"id_cliente_externo\": \"CLI001\",\n  \"observaciones\": \"Venta de SOAT cliente empresarial\",\n  \"estado\": \"completada\",\n  \"created_by\": \"admin\"\n}"
+                },
+                "url": {
+                    "raw": "{{base_url}}",
+                    "host": [
+                        "{{base_url}}"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "Crear Venta Mínima",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    },
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{supabase_key}}"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"id_punto_venta\": 1,\n  \"precio_total\": 125000.00\n}"
+                },
+                "url": {
+                    "raw": "{{base_url}}",
+                    "host": [
+                        "{{base_url}}"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "Obtener Todas las Ventas",
+            "request": {
+                "method": "GET",
+                "header": [
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{supabase_key}}"
+                    }
+                ],
+                "url": {
+                    "raw": "{{base_url}}",
+                    "host": [
+                        "{{base_url}}"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "Obtener Ventas con Paginación",
+            "request": {
+                "method": "GET",
+                "header": [
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{supabase_key}}"
+                    }
+                ],
+                "url": {
+                    "raw": "{{base_url}}?page=1&limit=5",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "query": [
+                        {
+                            "key": "page",
+                            "value": "1"
+                        },
+                        {
+                            "key": "limit",
+                            "value": "5"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "name": "Filtrar Ventas por Punto de Venta",
+            "request": {
+                "method": "GET",
+                "header": [
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{supabase_key}}"
+                    }
+                ],
+                "url": {
+                    "raw": "{{base_url}}?punto_venta_id=1",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "query": [
+                        {
+                            "key": "punto_venta_id",
+                            "value": "1"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "name": "Filtrar Ventas por Estado",
+            "request": {
+                "method": "GET",
+                "header": [
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{supabase_key}}"
+                    }
+                ],
+                "url": {
+                    "raw": "{{base_url}}?estado=completada",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "query": [
+                        {
+                            "key": "estado",
+                            "value": "completada"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "name": "Filtrar Ventas por Rango de Fechas",
+            "request": {
+                "method": "GET",
+                "header": [
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{supabase_key}}"
+                    }
+                ],
+                "url": {
+                    "raw": "{{base_url}}?fecha_desde=2024-01-01&fecha_hasta=2024-12-31",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "query": [
+                        {
+                            "key": "fecha_desde",
+                            "value": "2024-01-01"
+                        },
+                        {
+                            "key": "fecha_hasta",
+                            "value": "2024-12-31"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "name": "Obtener Venta por ID",
+            "request": {
+                "method": "GET",
+                "header": [
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{supabase_key}}"
+                    }
+                ],
+                "url": {
+                    "raw": "{{base_url}}/1",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "1"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "Actualizar Venta",
+            "request": {
+                "method": "PUT",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    },
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{supabase_key}}"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"precio_total\": 275000.00,\n  \"observaciones\": \"Venta actualizada - precio ajustado\",\n  \"estado\": \"pendiente\",\n  \"updated_by\": \"admin\"\n}"
+                },
+                "url": {
+                    "raw": "{{base_url}}/1",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "1"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "Actualizar Solo Observaciones",
+            "request": {
+                "method": "PUT",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    },
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{supabase_key}}"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"observaciones\": \"Cliente solicitó factura electrónica\"\n}"
+                },
+                "url": {
+                    "raw": "{{base_url}}/1",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "1"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "Eliminar Venta",
+            "request": {
+                "method": "DELETE",
+                "header": [
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{supabase_key}}"
+                    }
+                ],
+                "url": {
+                    "raw": "{{base_url}}/1",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "1"
+                    ]
+                }
+            }
+        }
+    ]
+}

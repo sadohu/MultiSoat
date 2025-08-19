@@ -1,0 +1,286 @@
+{
+  "info": {
+    "name": "Venta Certificado API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Endpoints para gestión de ventas de certificados en MultiSoat"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://your-project.supabase.co/functions/v1/venta_certificado",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Crear Venta Certificado",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{supabase_key}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"id_venta\": 1,\n  \"id_certificado\": 1,\n  \"precio_venta\": 125000.00,\n  \"monto_fijo_proveedor\": 100000.00,\n  \"descuento_aplicado\": 5000.00,\n  \"ganancia_pv\": 20000.00,\n  \"estado\": \"vendido\",\n  \"created_by\": \"admin\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}",
+          "host": ["{{base_url}}"]
+        }
+      }
+    },
+    {
+      "name": "Crear Venta Certificado Mínima",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{supabase_key}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"id_venta\": 1,\n  \"id_certificado\": 2,\n  \"precio_venta\": 115000.00\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}",
+          "host": ["{{base_url}}"]
+        }
+      }
+    },
+    {
+      "name": "Obtener Todas las Ventas de Certificados",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{supabase_key}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}",
+          "host": ["{{base_url}}"]
+        }
+      }
+    },
+    {
+      "name": "Obtener con Paginación",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{supabase_key}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}?page=1&limit=5",
+          "host": ["{{base_url}}"],
+          "query": [
+            {
+              "key": "page",
+              "value": "1"
+            },
+            {
+              "key": "limit",
+              "value": "5"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Filtrar por Venta",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{supabase_key}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}?venta_id=1",
+          "host": ["{{base_url}}"],
+          "query": [
+            {
+              "key": "venta_id",
+              "value": "1"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Filtrar por Certificado",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{supabase_key}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}?certificado_id=1",
+          "host": ["{{base_url}}"],
+          "query": [
+            {
+              "key": "certificado_id",
+              "value": "1"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Filtrar por Estado",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{supabase_key}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}?estado=vendido",
+          "host": ["{{base_url}}"],
+          "query": [
+            {
+              "key": "estado",
+              "value": "vendido"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Obtener por ID",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{supabase_key}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/1",
+          "host": ["{{base_url}}"],
+          "path": ["1"]
+        }
+      }
+    },
+    {
+      "name": "Actualizar Venta Certificado",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{supabase_key}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"precio_venta\": 130000.00,\n  \"descuento_aplicado\": 0,\n  \"ganancia_pv\": 25000.00,\n  \"estado\": \"vendido\",\n  \"updated_by\": \"admin\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/1",
+          "host": ["{{base_url}}"],
+          "path": ["1"]
+        }
+      }
+    },
+    {
+      "name": "Actualizar Solo Estado",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{supabase_key}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"estado\": \"cancelado\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/1",
+          "host": ["{{base_url}}"],
+          "path": ["1"]
+        }
+      }
+    },
+    {
+      "name": "Eliminar Venta Certificado",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{supabase_key}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/1",
+          "host": ["{{base_url}}"],
+          "path": ["1"]
+        }
+      }
+    },
+    {
+      "name": "Buscar Certificados de una Venta Específica",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{supabase_key}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}?venta_id=1&page=1&limit=20",
+          "host": ["{{base_url}}"],
+          "query": [
+            {
+              "key": "venta_id",
+              "value": "1"
+            },
+            {
+              "key": "page",
+              "value": "1"
+            },
+            {
+              "key": "limit",
+              "value": "20"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

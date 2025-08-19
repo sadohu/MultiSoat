@@ -390,3 +390,14 @@ verify_jwt = false
 import_map = "./functions/auth/deno.json"
 entrypoint = "./functions/auth/index.ts"
 
+[functions.venta]
+enabled = true
+verify_jwt = false
+import_map = "./functions/venta/deno.json"
+entrypoint = "./functions/venta/index.ts"
+
+[functions.venta_certificado]
+enabled = true
+verify_jwt = false
+import_map = "./functions/venta_certificado/deno.json"
+entrypoint = "./functions/venta_certificado/index.ts"

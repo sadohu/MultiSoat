@@ -366,6 +366,12 @@ verify_jwt = false
 import_map = "./functions/punto_venta/deno.json"
 entrypoint = "./functions/punto_venta/index.ts"
 
+[functions.afiliacion]
+enabled = true
+verify_jwt = false
+import_map = "./functions/afiliacion/deno.json"
+entrypoint = "./functions/afiliacion/index.ts"
+
 [functions.auth]
 enabled = true
 verify_jwt = false

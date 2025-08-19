@@ -1,0 +1,430 @@
+{
+	"info": {
+		"_postman_id": "afiliacion-id-12345",
+		"name": "MultiSoat Afiliacion API - Complete CRUD",
+		"description": "Complete CRUD operations for afiliacion_pv_proveedor with relationship management and approval workflows\n\nBase URL: https://wtaqmoxytfnxsggxqdhx.supabase.co/functions/v1/afiliacion\n\nFeatures:\n- CREATE: Affiliate sales points with providers\n- READ: Get all affiliations with pagination and filtering\n- UPDATE: Modify affiliation data and approve/reject\n- DELETE: Soft delete (sets estado to CANCELADA)\n- Relationship validation with proveedor, distribuidor (optional), punto_venta\n- Approval workflow management\n- Filtering by proveedor_id, punto_venta_id, estado",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1. CREATE Afiliacion",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"id_proveedor\": 1,\n  \"id_punto_venta\": 1,\n  \"id_distribuidor\": 1,\n  \"estado\": \"PENDIENTE_APROBACION\",\n  \"observaciones\": \"Afiliación inicial para punto de venta estratégico\"\n}"
+				},
+				"url": {
+					"raw": "https://wtaqmoxytfnxsggxqdhx.supabase.co/functions/v1/afiliacion",
+					"protocol": "https",
+					"host": [
+						"wtaqmoxytfnxsggxqdhx",
+						"supabase",
+						"co"
+					],
+					"path": [
+						"functions",
+						"v1",
+						"afiliacion"
+					]
+				}
+			}
+		},
+		{
+			"name": "2. CREATE Afiliacion Sin Distribuidor",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"id_proveedor\": 2,\n  \"id_punto_venta\": 2,\n  \"estado\": \"PENDIENTE_APROBACION\",\n  \"observaciones\": \"Afiliación directa sin distribuidor intermediario\"\n}"
+				},
+				"url": {
+					"raw": "https://wtaqmoxytfnxsggxqdhx.supabase.co/functions/v1/afiliacion",
+					"protocol": "https",
+					"host": [
+						"wtaqmoxytfnxsggxqdhx",
+						"supabase",
+						"co"
+					],
+					"path": [
+						"functions",
+						"v1",
+						"afiliacion"
+					]
+				}
+			}
+		},
+		{
+			"name": "3. GET All Afiliaciones",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://wtaqmoxytfnxsggxqdhx.supabase.co/functions/v1/afiliacion",
+					"protocol": "https",
+					"host": [
+						"wtaqmoxytfnxsggxqdhx",
+						"supabase",
+						"co"
+					],
+					"path": [
+						"functions",
+						"v1",
+						"afiliacion"
+					]
+				}
+			}
+		},
+		{
+			"name": "4. GET Afiliaciones with Pagination",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://wtaqmoxytfnxsggxqdhx.supabase.co/functions/v1/afiliacion?page=1&limit=5",
+					"protocol": "https",
+					"host": [
+						"wtaqmoxytfnxsggxqdhx",
+						"supabase",
+						"co"
+					],
+					"path": [
+						"functions",
+						"v1",
+						"afiliacion"
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "1"
+						},
+						{
+							"key": "limit",
+							"value": "5"
+						}
+					]
+				}
+			}
+		},
+		{
+			"name": "5. GET By Proveedor ID",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://wtaqmoxytfnxsggxqdhx.supabase.co/functions/v1/afiliacion?proveedor_id=1",
+					"protocol": "https",
+					"host": [
+						"wtaqmoxytfnxsggxqdhx",
+						"supabase",
+						"co"
+					],
+					"path": [
+						"functions",
+						"v1",
+						"afiliacion"
+					],
+					"query": [
+						{
+							"key": "proveedor_id",
+							"value": "1"
+						}
+					]
+				}
+			}
+		},
+		{
+			"name": "6. GET By Punto Venta ID",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://wtaqmoxytfnxsggxqdhx.supabase.co/functions/v1/afiliacion?punto_venta_id=1",
+					"protocol": "https",
+					"host": [
+						"wtaqmoxytfnxsggxqdhx",
+						"supabase",
+						"co"
+					],
+					"path": [
+						"functions",
+						"v1",
+						"afiliacion"
+					],
+					"query": [
+						{
+							"key": "punto_venta_id",
+							"value": "1"
+						}
+					]
+				}
+			}
+		},
+		{
+			"name": "7. GET By Estado",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://wtaqmoxytfnxsggxqdhx.supabase.co/functions/v1/afiliacion?estado=PENDIENTE",
+					"protocol": "https",
+					"host": [
+						"wtaqmoxytfnxsggxqdhx",
+						"supabase",
+						"co"
+					],
+					"path": [
+						"functions",
+						"v1",
+						"afiliacion"
+					],
+					"query": [
+						{
+							"key": "estado",
+							"value": "PENDIENTE_APROBACION"
+						}
+					]
+				}
+			}
+		},
+		{
+			"name": "8. GET Single Afiliacion by ID",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://wtaqmoxytfnxsggxqdhx.supabase.co/functions/v1/afiliacion/1",
+					"protocol": "https",
+					"host": [
+						"wtaqmoxytfnxsggxqdhx",
+						"supabase",
+						"co"
+					],
+					"path": [
+						"functions",
+						"v1",
+						"afiliacion",
+						"1"
+					]
+				}
+			}
+		},
+		{
+			"name": "9. UPDATE Afiliacion",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"id_distribuidor\": 2,\n  \"observaciones\": \"Actualización de observaciones y cambio de distribuidor\"\n}"
+				},
+				"url": {
+					"raw": "https://wtaqmoxytfnxsggxqdhx.supabase.co/functions/v1/afiliacion/1",
+					"protocol": "https",
+					"host": [
+						"wtaqmoxytfnxsggxqdhx",
+						"supabase",
+						"co"
+					],
+					"path": [
+						"functions",
+						"v1",
+						"afiliacion",
+						"1"
+					]
+				}
+			}
+		},
+		{
+			"name": "10. APPROVE Afiliacion",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"estado\": \"ACTIVA\",\n  \"observaciones\": \"Afiliación aprobada por el equipo comercial\"\n}"
+				},
+				"url": {
+					"raw": "https://wtaqmoxytfnxsggxqdhx.supabase.co/functions/v1/afiliacion/1",
+					"protocol": "https",
+					"host": [
+						"wtaqmoxytfnxsggxqdhx",
+						"supabase",
+						"co"
+					],
+					"path": [
+						"functions",
+						"v1",
+						"afiliacion",
+						"1"
+					]
+				}
+			}
+		},
+		{
+			"name": "11. REJECT Afiliacion",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"estado\": \"RECHAZADA\",\n  \"observaciones\": \"Documentación incompleta, favor revisar y reenviar\"\n}"
+				},
+				"url": {
+					"raw": "https://wtaqmoxytfnxsggxqdhx.supabase.co/functions/v1/afiliacion/2",
+					"protocol": "https",
+					"host": [
+						"wtaqmoxytfnxsggxqdhx",
+						"supabase",
+						"co"
+					],
+					"path": [
+						"functions",
+						"v1",
+						"afiliacion",
+						"2"
+					]
+				}
+			}
+		},
+		{
+			"name": "12. DELETE Afiliacion (Soft Delete)",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "https://wtaqmoxytfnxsggxqdhx.supabase.co/functions/v1/afiliacion/1",
+					"protocol": "https",
+					"host": [
+						"wtaqmoxytfnxsggxqdhx",
+						"supabase",
+						"co"
+					],
+					"path": [
+						"functions",
+						"v1",
+						"afiliacion",
+						"1"
+					]
+				}
+			}
+		},
+		{
+			"name": "13. CREATE Multiple Test Data",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"id_proveedor\": 1,\n  \"id_punto_venta\": 3,\n  \"id_distribuidor\": 1,\n  \"estado\": \"ACTIVA\",\n  \"observaciones\": \"Afiliación pre-aprobada para punto estratégico\"\n}"
+				},
+				"url": {
+					"raw": "https://wtaqmoxytfnxsggxqdhx.supabase.co/functions/v1/afiliacion",
+					"protocol": "https",
+					"host": [
+						"wtaqmoxytfnxsggxqdhx",
+						"supabase",
+						"co"
+					],
+					"path": [
+						"functions",
+						"v1",
+						"afiliacion"
+					]
+				}
+			}
+		},
+		{
+			"name": "14. Error Test - Invalid Proveedor",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"id_proveedor\": 999,\n  \"id_punto_venta\": 1,\n  \"estado\": \"PENDIENTE_APROBACION\",\n  \"observaciones\": \"Test con proveedor inexistente\"\n}"
+				},
+				"url": {
+					"raw": "https://wtaqmoxytfnxsggxqdhx.supabase.co/functions/v1/afiliacion",
+					"protocol": "https",
+					"host": [
+						"wtaqmoxytfnxsggxqdhx",
+						"supabase",
+						"co"
+					],
+					"path": [
+						"functions",
+						"v1",
+						"afiliacion"
+					]
+				}
+			}
+		},
+		{
+			"name": "15. Error Test - Duplicate Relationship",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"id_proveedor\": 1,\n  \"id_punto_venta\": 1,\n  \"estado\": \"PENDIENTE_APROBACION\",\n  \"observaciones\": \"Test de relación duplicada\"\n}"
+				},
+				"url": {
+					"raw": "https://wtaqmoxytfnxsggxqdhx.supabase.co/functions/v1/afiliacion",
+					"protocol": "https",
+					"host": [
+						"wtaqmoxytfnxsggxqdhx",
+						"supabase",
+						"co"
+					],
+					"path": [
+						"functions",
+						"v1",
+						"afiliacion"
+					]
+				}
+			}
+		}
+	]
+}

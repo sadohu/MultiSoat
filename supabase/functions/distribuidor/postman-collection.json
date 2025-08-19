@@ -1,0 +1,576 @@
+{
+    "info": {
+        "_postman_id": "distribuidor-crud-simple",
+        "name": "Distribuidor CRUD - MultiSoat",
+        "description": "Colección de pruebas para el CRUD simplificado de distribuidores sin autenticación",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "https://wtaqmoxytfnxsggxqdhx.supabase.co/functions/v1/distribuidor"
+        }
+    ],
+    "item": [
+        {
+            "name": "01 - Crear Distribuidor",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"id_proveedor\": 4,\n  \"nombre\": \"Distribuidor {{$randomCompanyName}}\",\n  \"email\": \"dist{{$randomBankAccount}}@empresa.com\",\n  \"telefono\": \"987654321\",\n  \"id_externo_db_data\": {{$randomInt}}\n}"
+                },
+                "url": {
+                    "raw": "{{base_url}}",
+                    "host": [
+                        "{{base_url}}"
+                    ]
+                }
+            },
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test('Status code is 201', function () {",
+                            "    pm.response.to.have.status(201);",
+                            "});",
+                            "",
+                            "pm.test('Distribuidor created successfully', function () {",
+                            "    const response = pm.response.json();",
+                            "    pm.expect(response.success).to.be.true;",
+                            "    pm.expect(response.data).to.exist;",
+                            "    pm.expect(response.data.data.id).to.exist;",
+                            "    pm.expect(response.data.message).to.include('exitosamente');",
+                            "    ",
+                            "    // Guardar el ID para siguientes requests",
+                            "    pm.collectionVariables.set('distribuidor_id', response.data.data.id);",
+                            "    pm.collectionVariables.set('distribuidor_email', response.data.data.email);",
+                            "    pm.collectionVariables.set('distribuidor_nombre', response.data.data.nombre);",
+                            "});",
+                            "",
+                            "pm.test('Response has required fields', function () {",
+                            "    const response = pm.response.json();",
+                            "    pm.expect(response.data.data.id_proveedor).to.exist;",
+                            "    pm.expect(response.data.data.nombre).to.exist;",
+                            "    pm.expect(response.data.data.email).to.exist;",
+                            "    pm.expect(response.data.data.estado).to.exist;",
+                            "});",
+                            "",
+                            "pm.test('Includes proveedor information', function () {",
+                            "    const response = pm.response.json();",
+                            "    pm.expect(response.data.data.proveedor).to.exist;",
+                            "    pm.expect(response.data.data.proveedor.razon_social).to.exist;",
+                            "});"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "02 - Obtener Distribuidor por ID",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{base_url}}/{{distribuidor_id}}",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "{{distribuidor_id}}"
+                    ]
+                }
+            },
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test('Status code is 200', function () {",
+                            "    pm.response.to.have.status(200);",
+                            "});",
+                            "",
+                            "pm.test('Distribuidor found successfully', function () {",
+                            "    const response = pm.response.json();",
+                            "    pm.expect(response.success).to.be.true;",
+                            "    pm.expect(response.data).to.exist;",
+                            "    pm.expect(response.data.id).to.equal(parseInt(pm.collectionVariables.get('distribuidor_id')));",
+                            "    pm.expect(response.message).to.include('encontrado');",
+                            "});",
+                            "",
+                            "pm.test('Data integrity check', function () {",
+                            "    const response = pm.response.json();",
+                            "    pm.expect(response.data.email).to.equal(pm.collectionVariables.get('distribuidor_email'));",
+                            "    pm.expect(response.data.nombre).to.equal(pm.collectionVariables.get('distribuidor_nombre'));",
+                            "});",
+                            "",
+                            "pm.test('Includes proveedor relationship', function () {",
+                            "    const response = pm.response.json();",
+                            "    pm.expect(response.data.proveedor).to.exist;",
+                            "    pm.expect(response.data.proveedor.razon_social).to.exist;",
+                            "});"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "03 - Listar Todos los Distribuidores",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{base_url}}",
+                    "host": [
+                        "{{base_url}}"
+                    ]
+                }
+            },
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test('Status code is 200', function () {",
+                            "    pm.response.to.have.status(200);",
+                            "});",
+                            "",
+                            "pm.test('Distribuidores list returned', function () {",
+                            "    const response = pm.response.json();",
+                            "    pm.expect(response.success).to.be.true;",
+                            "    pm.expect(response.data).to.be.an('array');",
+                            "    pm.expect(response.pagination).to.exist;",
+                            "});",
+                            "",
+                            "pm.test('Pagination data is correct', function () {",
+                            "    const response = pm.response.json();",
+                            "    pm.expect(response.pagination.page).to.exist;",
+                            "    pm.expect(response.pagination.limit).to.exist;",
+                            "    pm.expect(response.pagination.total).to.exist;",
+                            "    pm.expect(response.pagination.totalPages).to.exist;",
+                            "});",
+                            "",
+                            "pm.test('Each distribuidor has proveedor info', function () {",
+                            "    const response = pm.response.json();",
+                            "    if (response.data.length > 0) {",
+                            "        response.data.forEach(distribuidor => {",
+                            "            pm.expect(distribuidor.proveedor).to.exist;",
+                            "            pm.expect(distribuidor.proveedor.razon_social).to.exist;",
+                            "        });",
+                            "    }",
+                            "});"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "04 - Listar Distribuidores con Paginación",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{base_url}}?page=1&limit=5",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "query": [
+                        {
+                            "key": "page",
+                            "value": "1"
+                        },
+                        {
+                            "key": "limit",
+                            "value": "5"
+                        }
+                    ]
+                }
+            },
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test('Status code is 200', function () {",
+                            "    pm.response.to.have.status(200);",
+                            "});",
+                            "",
+                            "pm.test('Pagination parameters respected', function () {",
+                            "    const response = pm.response.json();",
+                            "    pm.expect(response.pagination.page).to.equal(1);",
+                            "    pm.expect(response.pagination.limit).to.equal(5);",
+                            "    pm.expect(response.data.length).to.be.at.most(5);",
+                            "});"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "05 - Actualizar Distribuidor",
+            "request": {
+                "method": "PUT",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"nombre\": \"{{$randomCompanyName}} - ACTUALIZADO\",\n  \"telefono\": \"956789{{$randomInt}}\",\n  \"id_externo_db_data\": {{$randomInt}}\n}"
+                },
+                "url": {
+                    "raw": "{{base_url}}/{{distribuidor_id}}",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "{{distribuidor_id}}"
+                    ]
+                }
+            },
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test('Status code is 200', function () {",
+                            "    pm.response.to.have.status(200);",
+                            "});",
+                            "",
+                            "pm.test('Distribuidor updated successfully', function () {",
+                            "    const response = pm.response.json();",
+                            "    pm.expect(response.success).to.be.true;",
+                            "    pm.expect(response.data).to.exist;",
+                            "    pm.expect(response.message).to.include('actualizado');",
+                            "});",
+                            "",
+                            "pm.test('Updated fields are correct', function () {",
+                            "    const response = pm.response.json();",
+                            "    pm.expect(response.data.nombre).to.include('ACTUALIZADO');",
+                            "});",
+                            "",
+                            "pm.test('Maintains proveedor relationship', function () {",
+                            "    const response = pm.response.json();",
+                            "    pm.expect(response.data.proveedor).to.exist;",
+                            "});"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "06 - Eliminar Distribuidor (Soft Delete)",
+            "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                    "raw": "{{base_url}}/{{distribuidor_id}}",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "{{distribuidor_id}}"
+                    ]
+                }
+            },
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test('Status code is 200', function () {",
+                            "    pm.response.to.have.status(200);",
+                            "});",
+                            "",
+                            "pm.test('Distribuidor deleted successfully', function () {",
+                            "    const response = pm.response.json();",
+                            "    pm.expect(response.success).to.be.true;",
+                            "    pm.expect(response.data).to.exist;",
+                            "    pm.expect(response.message).to.include('eliminado');",
+                            "});",
+                            "",
+                            "pm.test('Estado changed to INACTIVO', function () {",
+                            "    const response = pm.response.json();",
+                            "    pm.expect(response.data.estado).to.equal('INACTIVO');",
+                            "});"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "07 - Error: Distribuidor No Encontrado",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{base_url}}/99999",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "99999"
+                    ]
+                }
+            },
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test('Status code is 404', function () {",
+                            "    pm.response.to.have.status(404);",
+                            "});",
+                            "",
+                            "pm.test('Error message is correct', function () {",
+                            "    const response = pm.response.json();",
+                            "    pm.expect(response.success).to.be.false;",
+                            "    pm.expect(response.error).to.include('no encontrado');",
+                            "});"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "08 - Error: Crear Distribuidor sin Datos Requeridos",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"nombre\": \"Distribuidor Sin Proveedor\"\n}"
+                },
+                "url": {
+                    "raw": "{{base_url}}",
+                    "host": [
+                        "{{base_url}}"
+                    ]
+                }
+            },
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test('Status code is 400', function () {",
+                            "    pm.response.to.have.status(400);",
+                            "});",
+                            "",
+                            "pm.test('Error message mentions required fields', function () {",
+                            "    const response = pm.response.json();",
+                            "    pm.expect(response.success).to.be.false;",
+                            "    pm.expect(response.error).to.include('requeridos');",
+                            "});"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "09 - Error: Crear Distribuidor con Proveedor Inexistente",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"id_proveedor\": 99999,\n  \"nombre\": \"Distribuidor Test\",\n  \"email\": \"test@noexiste.com\"\n}"
+                },
+                "url": {
+                    "raw": "{{base_url}}",
+                    "host": [
+                        "{{base_url}}"
+                    ]
+                }
+            },
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test('Status code is 400', function () {",
+                            "    pm.response.to.have.status(400);",
+                            "});",
+                            "",
+                            "pm.test('Error message mentions proveedor not found', function () {",
+                            "    const response = pm.response.json();",
+                            "    pm.expect(response.success).to.be.false;",
+                            "    pm.expect(response.error).to.include('no existe');",
+                            "});"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "10 - Error: Crear Distribuidor con Email Duplicado",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"id_proveedor\": 4,\n  \"nombre\": \"Distribuidor Duplicado\",\n  \"email\": \"duplicate@test.com\"\n}"
+                },
+                "url": {
+                    "raw": "{{base_url}}",
+                    "host": [
+                        "{{base_url}}"
+                    ]
+                }
+            },
+            "event": [
+                {
+                    "listen": "prerequest",
+                    "script": {
+                        "exec": [
+                            "// Primero crear el distribuidor original",
+                            "pm.sendRequest({",
+                            "    url: pm.collectionVariables.get('base_url'),",
+                            "    method: 'POST',",
+                            "    header: {",
+                            "        'Content-Type': 'application/json'",
+                            "    },",
+                            "    body: {",
+                            "        mode: 'raw',",
+                            "        raw: JSON.stringify({",
+                            "            id_proveedor: 4,",
+                            "            nombre: 'Distribuidor Original',",
+                            "            email: 'duplicate@test.com'",
+                            "        })",
+                            "    }",
+                            "}, function(err, response) {",
+                            "    if (response) {",
+                            "        const responseJson = response.json();",
+                            "        if (responseJson.success) {",
+                            "            pm.collectionVariables.set('duplicate_test_id', responseJson.data.data.id);",
+                            "        }",
+                            "    }",
+                            "});"
+                        ],
+                        "type": "text/javascript"
+                    }
+                },
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test('Status code is 400', function () {",
+                            "    pm.response.to.have.status(400);",
+                            "});",
+                            "",
+                            "pm.test('Error message mentions duplicate email', function () {",
+                            "    const response = pm.response.json();",
+                            "    pm.expect(response.success).to.be.false;",
+                            "    pm.expect(response.error).to.include('Ya existe');",
+                            "});"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "11 - Listar Distribuidores por Proveedor",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{base_url}}?proveedor_id=4",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "query": [
+                        {
+                            "key": "proveedor_id",
+                            "value": "4",
+                            "description": "Filtrar por ID de proveedor"
+                        }
+                    ]
+                }
+            },
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test('Status code is 200', function () {",
+                            "    pm.response.to.have.status(200);",
+                            "});",
+                            "",
+                            "pm.test('All distribuidores belong to specified proveedor', function () {",
+                            "    const response = pm.response.json();",
+                            "    if (response.data.length > 0) {",
+                            "        response.data.forEach(distribuidor => {",
+                            "            pm.expect(distribuidor.id_proveedor).to.equal(4);",
+                            "        });",
+                            "    }",
+                            "});"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ]
+        }
+    ],
+    "event": [
+        {
+            "listen": "prerequest",
+            "script": {
+                "type": "text/javascript",
+                "exec": [
+                    "// Pre-request script global",
+                    "console.log('🚀 Ejecutando prueba de Distribuidor CRUD');"
+                ]
+            }
+        },
+        {
+            "listen": "test",
+            "script": {
+                "type": "text/javascript",
+                "exec": [
+                    "// Test script global",
+                    "pm.test('Response time is reasonable', function () {",
+                    "    pm.expect(pm.response.responseTime).to.be.below(3000);",
+                    "});",
+                    "",
+                    "pm.test('Content-Type is JSON', function () {",
+                    "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                    "});"
+                ]
+            }
+        }
+    ]
+}

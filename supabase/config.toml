@@ -354,6 +354,12 @@ verify_jwt = false
 import_map = "./functions/proveedor/deno.json"
 entrypoint = "./functions/proveedor/index.ts"
 
+[functions.distribuidor]
+enabled = true
+verify_jwt = false
+import_map = "./functions/distribuidor/deno.json"
+entrypoint = "./functions/distribuidor/index.ts"
+
 [functions.auth]
 enabled = true
 verify_jwt = false
